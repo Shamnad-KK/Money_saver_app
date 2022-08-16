@@ -319,7 +319,8 @@ class _SettingScreenState extends State<SettingScreen>
                 TransactionDbFunctions().deleteAllData();
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('App reset success'),
+                  duration: Duration(seconds: 1),
+                  content: Text('Reseted successfully'),
                   backgroundColor: Colors.green,
                 ));
                 Navigator.pushAndRemoveUntil(

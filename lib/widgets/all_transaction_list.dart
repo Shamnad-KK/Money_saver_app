@@ -1,122 +1,122 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
 import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
+import 'package:money_manager/getx/get_x.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
 
-class AllTransactionList extends StatefulWidget {
-  const AllTransactionList({
+class AllTransactionList extends StatelessWidget {
+  AllTransactionList({
     Key? key,
-    required this.valueListenable,
+    required this.foundData,
+    required this.tabController,
   }) : super(key: key);
+  final RxList foundData;
+  final TabController tabController;
 
-  final ValueListenable<List<TransactionModal>> valueListenable;
-  @override
-  State<AllTransactionList> createState() => _AllTransactionListState();
-}
-
-class _AllTransactionListState extends State<AllTransactionList> {
-  @override
-  void initState() {
-    TransactionDbFunctions().refreshUi();
-    super.initState();
-  }
-
+  final DropDownController dropDownController = Get.find();
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      builder:
-          (BuildContext context, List<TransactionModal> value, Widget? child) {
-        if (value.isEmpty) {
-          return const Center(
-            child: Text('No Transactions'),
-          );
-        } else {
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Slidable(
-                startActionPane: ActionPane(
-                  motion: const DrawerMotion(),
-                  extentRatio: 1,
-                  children: [
-                    SlidableAction(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(5.r),
-                        bottomLeft: Radius.circular(5.r),
-                      ),
-                      onPressed: (context) {
-                        setState(
-                          () {
-                            _showPopUp(value, index);
-                          },
-                        );
-                      },
-                      backgroundColor: Colors.red,
-                      label: 'Delete',
-                      icon: Icons.delete,
-                    ),
-                    SlidableAction(
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(5.r),
-                        bottomRight: Radius.circular(5.r),
-                      ),
-                      onPressed: (context) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (ctx) => AddTransactionScreen(
-                              type: ScreenType.editScreen,
-                              transactionModal: value[index],
-                            ),
-                          ),
-                        );
-                      },
-                      backgroundColor: Colors.blueGrey,
-                      label: 'Edit',
-                      icon: Icons.edit,
-                    )
-                  ],
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(0),
-                  leading: Icon(
-                    value[index].type == CategoryType.income
-                        ? Icons.arrow_circle_up
-                        : Icons.arrow_circle_down,
-                    color: value[index].type == CategoryType.income
-                        ? Colors.green
-                        : Colors.red,
-                  ),
-                  title: Text(
-                    value[index].name,
-                    style: appBodyTextStyle,
-                  ),
-                  trailing: Text(
-                    '₹${value[index].amount.round()}',
-                    style: homeAmountStyle,
-                  ),
-                  subtitle: Text(
-                    DateFormat.yMMMMd().format(value[index].date),
-                    style: homeDateStyle,
-                  ),
-                ),
-              );
-            },
-            itemCount: value.length,
-          );
-        }
-      },
-      valueListenable: widget.valueListenable,
+    return Obx(
+      () => dropDownController.foundData.isEmpty
+          ? const Center(
+              child: Center(
+                child: Text('No Transactions'),
+              ),
+            )
+          : dropDownController.rebuildList.value
+              ? listView(dropDownController)
+              : listView(dropDownController),
     );
   }
 
-  void _showPopUp(List<TransactionModal> value, int index) {
+  ListView listView(DropDownController dropDownController) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (context, index) {
+        return Slidable(
+          startActionPane: ActionPane(
+            motion: const DrawerMotion(),
+            extentRatio: 1,
+            children: [
+              SlidableAction(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(5.r),
+                  bottomLeft: Radius.circular(5.r),
+                ),
+                onPressed: (context) {
+                  _showPopUp(dropDownController.foundData, index, context);
+                },
+                backgroundColor: Colors.red,
+                label: 'Delete',
+                icon: Icons.delete,
+              ),
+              SlidableAction(
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(5.r),
+                  bottomRight: Radius.circular(5.r),
+                ),
+                onPressed: (context) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (ctx) => AddTransactionScreen(
+                        type: ScreenAction.editScreen,
+                        transactionModal: dropDownController.foundData[index],
+                      ),
+                    ),
+                  );
+                },
+                backgroundColor: Colors.blueGrey,
+                label: 'Edit',
+                icon: Icons.edit,
+              )
+            ],
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(0),
+            leading: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  dropDownController.foundData[index].type ==
+                          CategoryType.income
+                      ? Icons.arrow_circle_up
+                      : Icons.arrow_circle_down,
+                  color: dropDownController.foundData[index].type ==
+                          CategoryType.income
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ],
+            ),
+            title: Text(
+              dropDownController.foundData[index].categoryModal.name,
+              style: appBodyTextStyle,
+            ),
+            trailing: Text(
+              '₹${dropDownController.foundData[index].amount.round()}',
+              style: homeAmountStyle,
+            ),
+            subtitle: Text(
+              DateFormat.yMMMMd()
+                  .format(dropDownController.foundData[index].date),
+              style: homeDateStyle,
+            ),
+          ),
+        );
+      },
+      itemCount: dropDownController.foundData.length,
+    );
+  }
+
+  void _showPopUp(
+      List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -129,12 +129,15 @@ class _AllTransactionListState extends State<AllTransactionList> {
               TextButton(
                 onPressed: () async {
                   setNewState(() {
-                    value[index].delete();
+                    value[index].delete().whenComplete(() => dropDownController
+                        .allFilter(tabController: tabController));
+                    dropDownController.update();
                     TransactionDbFunctions().refreshUi();
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
+                      duration: Duration(seconds: 1),
                       content: Text('Transaction deleted'),
                       backgroundColor: Colors.green,
                     ),

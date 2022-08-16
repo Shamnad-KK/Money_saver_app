@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/database/functions/transaction_db_functions.dart';
+import 'package:get/get.dart';
+import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/getx/get_x.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/statistics_sort/stats_sort.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
@@ -16,15 +18,21 @@ class StatisticsScreen extends StatefulWidget {
 class _StatisticsScreenState extends State<StatisticsScreen>
     with TickerProviderStateMixin {
   late TabController tabController;
+  filter() async {
+    await dropDownController.statsFilter(tabController: tabController);
+  }
 
   @override
   void initState() {
-    tabController = TabController(
-      length: 3,
-      vsync: this,
-    );
+    tabController = TabController(length: 3, vsync: this);
+
+    dropDownController.foundData.value = dropDownController.allData;
+
     super.initState();
   }
+
+  String dropDownValue = 'ALL';
+  final DropDownController dropDownController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +50,45 @@ class _StatisticsScreenState extends State<StatisticsScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            Obx(
+              () => DropdownButtonHideUnderline(
+                child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: OutlineInputBorder(
+                        borderSide: const BorderSide(
+                          color: blackColor,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          10.r,
+                        ),
+                      ),
+                    ),
+                    value: dropDownController.statsDropDownValue.value,
+                    items: ['ALL', 'TODAY', '7 DAYS', '30 DAYS']
+                        .map(
+                          (String value) => DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (String? newValue) async {
+                      dropDownController.foundData.value =
+                          dropDownController.allData;
+                      dropDownController.statsDropDownValue.value = newValue!;
+                      await dropDownController.statsFilter(
+                          tabController: tabController);
+                    }),
+              ),
+            ),
+            sBoxH30,
             TabBar(
+              onTap: (value) {
+                dropDownController.foundData.value = dropDownController.allData;
+                chartSort(dropDownController.statsFilter(
+                    tabController: tabController));
+              },
               controller: tabController,
               indicatorColor: Colors.transparent,
               labelColor: whiteColor,
@@ -64,7 +110,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
               tabs: const [
                 Tab(
                   child: Text(
-                    'Overview',
+                    'All',
                   ),
                 ),
                 Tab(
@@ -82,92 +128,101 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             Expanded(
               flex: 2,
               child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
                   //overview
-                  TransactionDbFunctions.allTransactionNotifier.value.isNotEmpty
-                      ? SfCircularChart(
-                          legend: Legend(
-                            isResponsive: true,
-                            isVisible: true,
-                          ),
-                          series: <CircularSeries>[
-                            PieSeries<ChartData, String>(
-                              explode: true,
-                              explodeGesture: ActivationMode.longPress,
-                              dataLabelSettings: const DataLabelSettings(
-                                isVisible: true,
-                              ),
-                              dataSource: chartSort(TransactionDbFunctions
-                                  .allTransactionNotifier.value),
-                              xValueMapper: (ChartData transaction, _) =>
-                                  transaction.name,
-                              yValueMapper: (ChartData transaction, _) =>
-                                  transaction.amount,
+                  Obx(
+                    () => dropDownController.foundData.isNotEmpty
+                        ? SfCircularChart(
+                            legend: Legend(
+                              isResponsive: true,
+                              isVisible: true,
                             ),
-                          ],
-                        )
-                      : const Center(
-                          child: Text(
-                            'No Transactions to display',
+                            series: <CircularSeries>[
+                              PieSeries<ChartData, String>(
+                                explode: true,
+                                explodeGesture: ActivationMode.longPress,
+                                dataLabelSettings: const DataLabelSettings(
+                                  isVisible: true,
+                                ),
+                                dataSource: chartSort(dropDownController
+                                    .statsFilter(tabController: tabController)),
+                                xValueMapper: (ChartData transaction, _) =>
+                                    transaction.name,
+                                yValueMapper: (ChartData transaction, _) =>
+                                    transaction.amount,
+                              ),
+                            ],
+                          )
+                        : const Center(
+                            child: Text(
+                              'No Transactions to display',
+                            ),
                           ),
-                        ),
+                  ),
+
                   //income
-                  TransactionDbFunctions
-                          .incomeTransactionNotifier.value.isNotEmpty
-                      ? SfCircularChart(
-                          legend: Legend(
-                            isResponsive: true,
-                            isVisible: true,
+                  Obx(
+                    () => dropDownController.foundData.isNotEmpty
+                        ? SfCircularChart(
+                            legend: Legend(
+                              isResponsive: true,
+                              isVisible: true,
+                            ),
+                            series: <CircularSeries>[
+                              PieSeries<ChartData, String>(
+                                  explode: true,
+                                  explodeGesture: ActivationMode.longPress,
+                                  dataSource: chartSort(
+                                      dropDownController.statsFilter(
+                                          tabController: tabController)),
+                                  dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                  ),
+                                  xValueMapper: (ChartData transaction, _) =>
+                                      transaction.name,
+                                  yValueMapper: (ChartData transaction, _) =>
+                                      transaction.amount),
+                            ],
+                          )
+                        : const Center(
+                            child: Text(
+                              'No Transactions to display',
+                            ),
                           ),
-                          series: <CircularSeries>[
-                            PieSeries<ChartData, String>(
-                                explode: true,
-                                explodeGesture: ActivationMode.longPress,
-                                dataSource: chartSort(TransactionDbFunctions
-                                    .incomeTransactionNotifier.value),
-                                dataLabelSettings: const DataLabelSettings(
-                                  isVisible: true,
-                                ),
-                                xValueMapper: (ChartData transaction, _) =>
-                                    transaction.name,
-                                yValueMapper: (ChartData transaction, _) =>
-                                    transaction.amount),
-                          ],
-                        )
-                      : const Center(
-                          child: Text(
-                            'No Transactions to display',
-                          ),
-                        ),
+                  ),
+
                   //expense
-                  TransactionDbFunctions
-                          .expenseTransactionNotifier.value.isNotEmpty
-                      ? SfCircularChart(
-                          legend: Legend(
-                            isResponsive: true,
-                            isVisible: true,
+                  Obx(
+                    () => dropDownController.foundData.isNotEmpty
+                        ? SfCircularChart(
+                            legend: Legend(
+                              isResponsive: true,
+                              isVisible: true,
+                            ),
+                            series: <CircularSeries>[
+                              PieSeries<ChartData, String>(
+                                  explode: true,
+                                  explodeGesture: ActivationMode.longPress,
+                                  dataLabelSettings: const DataLabelSettings(
+                                    isVisible: true,
+                                  ),
+                                  dataSource: chartSort(
+                                      dropDownController.statsFilter(
+                                          tabController: tabController)),
+                                  xValueMapper: (ChartData transaction, _) =>
+                                      transaction.name,
+                                  yValueMapper: (ChartData transaction, _) =>
+                                      transaction.amount),
+                            ],
+                          )
+                        : const Center(
+                            child: Text(
+                              'No Transactions to display',
+                            ),
                           ),
-                          series: <CircularSeries>[
-                            PieSeries<ChartData, String>(
-                                explode: true,
-                                explodeGesture: ActivationMode.longPress,
-                                dataLabelSettings: const DataLabelSettings(
-                                  isVisible: true,
-                                ),
-                                dataSource: chartSort(TransactionDbFunctions
-                                    .expenseTransactionNotifier.value),
-                                xValueMapper: (ChartData transaction, _) =>
-                                    transaction.name,
-                                yValueMapper: (ChartData transaction, _) =>
-                                    transaction.amount),
-                          ],
-                        )
-                      : const Center(
-                          child: Text(
-                            'No Transactions to display',
-                          ),
-                        ),
+                  ),
                 ],
               ),
             ),

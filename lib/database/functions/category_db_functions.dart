@@ -9,6 +9,8 @@ class CategoryDbFunctions {
       ValueNotifier([]);
   static final ValueNotifier<List<CategoryModal>> expenseModalNotifier =
       ValueNotifier([]);
+  static final ValueNotifier<List<CategoryModal>> allCategoryNotifier =
+      ValueNotifier([]);
 
   CategoryDbFunctions._instance();
   static CategoryDbFunctions instance = CategoryDbFunctions._instance();
@@ -30,11 +32,13 @@ class CategoryDbFunctions {
 
   Future<void> refreshUi() async {
     final getAllCatogories = await getAllCategories();
+    allCategoryNotifier.value.clear();
     incomeModalNotifier.value.clear();
     expenseModalNotifier.value.clear();
     await Future.forEach(
       getAllCatogories,
       (CategoryModal category) {
+        allCategoryNotifier.value.add(category);
         if (category.type == CategoryType.income) {
           incomeModalNotifier.value.add(category);
         } else if (category.type == CategoryType.expense) {
@@ -42,6 +46,7 @@ class CategoryDbFunctions {
         }
       },
     );
+    allCategoryNotifier.notifyListeners();
     incomeModalNotifier.notifyListeners();
     expenseModalNotifier.notifyListeners();
   }

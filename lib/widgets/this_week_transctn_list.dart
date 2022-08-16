@@ -1,171 +1,165 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
 import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
+import 'package:money_manager/getx/get_x.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
 
-class CustomTransactionList extends StatefulWidget {
-  const CustomTransactionList({
+class CustomTransactionList extends StatelessWidget {
+  CustomTransactionList({
     Key? key,
-    required this.customDropDownValue,
-    required this.valueListenable,
-    required this.dropDownValue,
+    required this.foundData,
+    required this.tabController,
   }) : super(key: key);
-  final ValueListenable<List<TransactionModal>> valueListenable;
-  final ValueNotifier<String> customDropDownValue;
-  final ValueNotifier<String> dropDownValue;
+  final TabController tabController;
+  final RxList foundData;
 
-  @override
-  State<CustomTransactionList> createState() => _CustomTransactionListState();
-}
-
-class _CustomTransactionListState extends State<CustomTransactionList> {
-  @override
-  void initState() {
-    TransactionDbFunctions().refreshUi();
-    TransactionDbFunctions().sortCustomTransaction();
-    super.initState();
-  }
-
+  final DropDownController dropDownController = Get.find();
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(builder: (BuildContext context,
-        void Function(void Function()) setDropDownState) {
-      return Column(
-        children: [
-          sBoxH10,
-          DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              isDense: true,
-              border: OutlineInputBorder(
-                borderSide: const BorderSide(
-                  color: blackColor,
-                ),
-                borderRadius: BorderRadius.circular(
-                  10.r,
-                ),
+    return Column(
+      children: [
+        sBoxH10,
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            isDense: true,
+            border: OutlineInputBorder(
+              borderSide: const BorderSide(
+                color: blackColor,
+              ),
+              borderRadius: BorderRadius.circular(
+                10.r,
               ),
             ),
-            icon: const Icon(
-              Icons.keyboard_arrow_down,
-            ),
-            value: widget.customDropDownValue.value,
-            items: ['THIS WEEK', 'THIS MONTH', 'THIS YEAR']
-                .map(
-                  (value) => DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(
-                      value,
-                      style: appBodyTextStyle,
-                    ),
+          ),
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+          ),
+          value: dropDownController.customDropDownValue.value,
+          items: ['ONE WEEK', 'ONE MONTH', 'ONE YEAR']
+              .map(
+                (value) => DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(
+                    value,
+                    style: appBodyTextStyle,
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (String? newValue) async {
+            dropDownController.customDropDownValue.value = newValue!;
+            await dropDownController.customFilter(tabController: tabController);
+            dropDownController.rebuildList.value =
+                !dropDownController.rebuildList.value;
+          },
+        ),
+        Obx(
+          () => dropDownController.foundData.isEmpty
+              ? const Expanded(
+                  child: Center(
+                    child: Text('No Transactions'),
                   ),
                 )
-                .toList(),
-            onChanged: (String? newValue) {
-              widget.customDropDownValue.value = newValue!;
-              setDropDownState(() {});
-            },
-          ),
-          Expanded(
-            child: ValueListenableBuilder(
-              builder: (BuildContext context, List<TransactionModal> value,
-                  Widget? child) {
-                if (value.isEmpty) {
-                  return const Center(
-                    child: Text('No Transactions'),
-                  );
-                } else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return Slidable(
-                        startActionPane: ActionPane(
-                          motion: const DrawerMotion(),
-                          extentRatio: 1,
-                          children: [
-                            SlidableAction(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(5.r),
-                                bottomLeft: Radius.circular(5.r),
-                              ),
-                              onPressed: (context) {
-                                setState(
-                                  () {
-                                    _showPopUp(value, index);
-                                  },
-                                );
-                              },
-                              backgroundColor: Colors.red,
-                              label: 'Delete',
-                              icon: Icons.delete,
-                            ),
-                            SlidableAction(
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(5.r),
-                                bottomRight: Radius.circular(5.r),
-                              ),
-                              onPressed: (context) {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (ctx) => AddTransactionScreen(
-                                      type: ScreenType.editScreen,
-                                      transactionModal: value[index],
-                                    ),
-                                  ),
-                                );
-                              },
-                              backgroundColor: Colors.blueGrey,
-                              label: 'Edit',
-                              icon: Icons.edit,
-                            )
-                          ],
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.all(0),
-                          leading: Icon(
-                            value[index].type == CategoryType.income
-                                ? Icons.arrow_circle_up
-                                : Icons.arrow_circle_down,
-                            color: value[index].type == CategoryType.income
-                                ? Colors.green
-                                : Colors.red,
-                          ),
-                          title: Text(
-                            value[index].name,
-                            style: appBodyTextStyle,
-                          ),
-                          trailing: Text(
-                            "₹ ${value[index].amount.round()}",
-                            style: homeAmountStyle,
-                          ),
-                          subtitle: Text(
-                            DateFormat.yMMMMd().format(value[index].date),
-                            style: homeDateStyle,
-                          ),
-                        ),
-                      );
-                    },
-                    itemCount: value.length,
-                  );
-                }
-              },
-              valueListenable: widget.valueListenable,
-            ),
-          ),
-        ],
-      );
-    });
+              : dropDownController.rebuildList.value
+                  ? listView(dropDownController)
+                  : listView(dropDownController),
+        ),
+      ],
+    );
   }
 
-  void _showPopUp(List<TransactionModal> value, int index) {
+  Expanded listView(DropDownController dropDownController) {
+    return Expanded(
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemBuilder: (context, index) {
+          return Slidable(
+            startActionPane: ActionPane(
+              motion: const DrawerMotion(),
+              extentRatio: 1,
+              children: [
+                SlidableAction(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(5.r),
+                    bottomLeft: Radius.circular(5.r),
+                  ),
+                  onPressed: (context) {
+                    _showPopUp(dropDownController.foundData, index, context);
+                  },
+                  backgroundColor: Colors.red,
+                  label: 'Delete',
+                  icon: Icons.delete,
+                ),
+                SlidableAction(
+                  borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(5.r),
+                    bottomRight: Radius.circular(5.r),
+                  ),
+                  onPressed: (context) {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (ctx) => AddTransactionScreen(
+                          type: ScreenAction.editScreen,
+                          transactionModal: dropDownController.foundData[index],
+                        ),
+                      ),
+                    );
+                  },
+                  backgroundColor: Colors.blueGrey,
+                  label: 'Edit',
+                  icon: Icons.edit,
+                )
+              ],
+            ),
+            child: ListTile(
+              contentPadding: const EdgeInsets.all(0),
+              leading: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    dropDownController.foundData[index].type ==
+                            CategoryType.income
+                        ? Icons.arrow_circle_up
+                        : Icons.arrow_circle_down,
+                    color: dropDownController.foundData[index].type ==
+                            CategoryType.income
+                        ? Colors.green
+                        : Colors.red,
+                  ),
+                ],
+              ),
+              title: Text(
+                dropDownController.foundData[index].categoryModal.name,
+                style: appBodyTextStyle,
+              ),
+              trailing: Text(
+                "₹ ${dropDownController.foundData[index].amount.round()}",
+                style: homeAmountStyle,
+              ),
+              subtitle: Text(
+                DateFormat.yMMMMd()
+                    .format(dropDownController.foundData[index].date),
+                style: homeDateStyle,
+              ),
+            ),
+          );
+        },
+        itemCount: dropDownController.foundData.length,
+      ),
+    );
+  }
+
+  void _showPopUp(
+      List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -178,12 +172,15 @@ class _CustomTransactionListState extends State<CustomTransactionList> {
               TextButton(
                 onPressed: () {
                   setNewState(() {
-                    value[index].delete();
+                    value[index].delete().whenComplete(() => dropDownController
+                        .customFilter(tabController: tabController));
+
                     TransactionDbFunctions().refreshUi();
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
+                      duration: Duration(seconds: 1),
                       content: Text('Transaction deleted'),
                       backgroundColor: Colors.green,
                     ),
@@ -203,36 +200,5 @@ class _CustomTransactionListState extends State<CustomTransactionList> {
         });
       },
     );
-  }
-
-  customDelete(int index) {
-    if (widget.dropDownValue.value == 'ALL' &&
-        widget.customDropDownValue.value == 'THIS WEEK') {
-      TransactionDbFunctions().thisWeekAllNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'INCOME' &&
-        widget.customDropDownValue.value == 'THIS WEEK') {
-      TransactionDbFunctions().thisWeekIncomeNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'EXPENSE' &&
-        widget.customDropDownValue.value == 'THIS WEEK') {
-      TransactionDbFunctions().thisWeekExpenseNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'ALL' &&
-        widget.customDropDownValue.value == 'THIS MONTH') {
-      TransactionDbFunctions().thisMonthAllNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'INCOME' &&
-        widget.customDropDownValue.value == 'THIS MONTH') {
-      TransactionDbFunctions().thisMonthIncomeNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'EXPENSE' &&
-        widget.customDropDownValue.value == 'THIS MONTH') {
-      TransactionDbFunctions().thisMonthExpenseNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'ALL' &&
-        widget.customDropDownValue.value == 'THIS YEAR') {
-      TransactionDbFunctions().thisYearAllNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'INCOME' &&
-        widget.customDropDownValue.value == 'THIS YEAR') {
-      TransactionDbFunctions().thisYearIncomeNotifier.value.removeAt(index);
-    } else if (widget.dropDownValue.value == 'EXPENSE' &&
-        widget.customDropDownValue.value == 'THIS YEAR') {
-      TransactionDbFunctions().thisYearExpenseNotifier.value.removeAt(index);
-    }
   }
 }

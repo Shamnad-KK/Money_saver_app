@@ -30,7 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       results = transactionModel
           .where(
-            (element) => element.name.toLowerCase().contains(
+            (element) => element.categoryModal.name.toLowerCase().contains(
                   enteredKeyword.toLowerCase(),
                 ),
           )
@@ -129,7 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         : Colors.red,
                               ),
                               title: Text(
-                                foundList[index].name,
+                                foundList[index].categoryModal.name,
                                 style: appBodyTextStyle,
                               ),
                               trailing: Text(
@@ -147,7 +147,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         itemCount: foundList.length,
                       )
                     : const Center(
-                        child: Text('No match found'),
+                        child: Text('No data found'),
                       ),
               ],
             ),
@@ -175,6 +175,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
+                    duration: Duration(seconds: 1),
                     content: Text('Transaction deleted'),
                     backgroundColor: Colors.green,
                   ),

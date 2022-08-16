@@ -14,7 +14,7 @@ import 'package:money_manager/widgets/bottom_navbar.dart';
 import 'package:money_manager/widgets/button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-enum ScreenType {
+enum ScreenAction {
   addScreen,
   editScreen,
 }
@@ -25,7 +25,7 @@ class AddTransactionScreen extends StatefulWidget {
     required this.type,
     this.transactionModal,
   }) : super(key: key);
-  ScreenType type;
+  ScreenAction type;
   TransactionModal? transactionModal;
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -42,6 +42,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   DateTime? _selectedDate;
   final TextEditingController amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  List<CategoryModal> names = CategoryDbFunctions.allCategoryNotifier.value;
 
   Future<void> _showDate() async {
     final DateTime? result = await showDatePicker(
@@ -60,7 +61,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   void initState() {
     CategoryDbFunctions().refreshUi();
-    if (widget.type == ScreenType.editScreen) {
+    if (widget.type == ScreenAction.editScreen) {
+      //dropDownValue = widget.transactionModal?.categoryModal.name;
+      categoryModal = widget.transactionModal?.categoryModal;
       categoryType = widget.transactionModal!.type;
       amountController.text = widget.transactionModal!.amount.toString();
       dateController.text =
@@ -76,7 +79,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBarWidget(
-        leading: widget.type == ScreenType.addScreen
+        leading: widget.type == ScreenAction.addScreen
             ? 'Add Transaction'
             : 'Edit Transaction',
       ),
@@ -151,7 +154,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   builder: (BuildContext context, List<CategoryModal> value,
                       Widget? child) {
                     return DropdownButtonFormField<String>(
-                      hint: const Text('Choose a category'),
                       validator: (value) {
                         if (value == null) {
                           return 'Category type cannot be empty';
@@ -159,6 +161,20 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         return null;
                       },
                       decoration: InputDecoration(
+                        hintText: widget.type == ScreenAction.addScreen
+                            ? categoryType == CategoryType.income
+                                ? CategoryDbFunctions
+                                        .incomeModalNotifier.value.isEmpty
+                                    ? 'Please add category'
+                                    : 'Choose  category'
+                                : CategoryDbFunctions
+                                        .expenseModalNotifier.value.isEmpty
+                                    ? 'Please add category'
+                                    : 'Choose  category'
+                            : widget.transactionModal?.type == categoryType
+                                ? widget.transactionModal!.categoryModal.name
+                                : 'Choose  category',
+                        hintStyle: appBodyTextStyle,
                         border: OutlineInputBorder(
                           borderSide: const BorderSide(
                             color: blackColor,
@@ -230,6 +246,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'Amount',
+                    hintStyle: appBodyTextStyle,
                     border: OutlineInputBorder(
                       borderSide: const BorderSide(
                         color: blackColor,
@@ -253,6 +270,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   decoration: InputDecoration(
                     isDense: true,
                     hintText: 'Date',
+                    hintStyle: appBodyTextStyle,
                     border: OutlineInputBorder(
                       borderSide: const BorderSide(
                         color: blackColor,
@@ -310,23 +328,25 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       final transactionModal = TransactionModal(
           amount: parsedAmount!,
           id: DateTime.now().microsecondsSinceEpoch.toString(),
-          name: categoryModal!.name,
+          categoryModal: categoryModal!,
           date: _selectedDate!,
           type: categoryType!);
-      if (widget.type == ScreenType.addScreen) {
+      if (widget.type == ScreenAction.addScreen) {
         await TransactionDbFunctions().addTransaction(transactionModal);
         if (!mounted) {}
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            duration: Duration(seconds: 1),
             content: Text('Transaction added'),
             backgroundColor: Colors.green,
           ),
         );
-      } else if (widget.type == ScreenType.editScreen) {
+      } else if (widget.type == ScreenAction.editScreen) {
         await widget.transactionModal?.editTransaction(transactionModal);
         if (!mounted) {}
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
+            duration: Duration(seconds: 1),
             content: Text('Transaction edited'),
             backgroundColor: Colors.green,
           ),

@@ -181,6 +181,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
       if (!mounted) {}
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
+          duration: Duration(seconds: 1),
           content: Text('Category added'),
           backgroundColor: Colors.green,
         ),

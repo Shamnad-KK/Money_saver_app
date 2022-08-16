@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
+import 'package:money_manager/getx/get_x.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
@@ -13,6 +15,8 @@ import 'package:money_manager/widgets/today_trasaction_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../database/models/transaction_model/transaction_model.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -22,16 +26,52 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController tabController;
+  late DropDownController dropDownController;
   String name = '';
+
+  filter() async {
+    await dropDownController.allFilter(tabController: tabController);
+    dropDownController.rebuildList.value =
+        !dropDownController.rebuildList.value;
+    await dropDownController.customFilter(tabController: tabController);
+  }
+
+  late final List<TransactionModal> allData;
+
+  initialise() async {
+    allData = TransactionDbFunctions.allTransactionNotifier.value;
+    await TransactionDbFunctions().refreshUi();
+    dropDownController.foundData.value = allData;
+    dropDownController.rebuildList.value =
+        !dropDownController.rebuildList.value;
+  }
 
   @override
   void initState() {
+    tabController = TabController(length: 3, vsync: this);
+    dropDownController = Get.put(DropDownController());
     saveName();
     CategoryDbFunctions().refreshUi();
-    TransactionDbFunctions().refreshUi;
-    TransactionDbFunctions().sortCustomTransaction();
 
-    tabController = TabController(length: 3, vsync: this);
+    // Future.delayed(const Duration(milliseconds: 500), () {
+    // setState(() {
+    //dropDownController.foundData.value = dropDownController.allData;
+    // dropDownController.rebuildList.value =
+    //     !dropDownController.rebuildList.value;
+    //});
+    // });
+    initialise();
+    TransactionDbFunctions().refreshUi();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      filter();
+      //Future.delayed(const Duration(milliseconds: 300), () {
+      setState(() {
+        dropDownController.foundData.value = dropDownController.allData;
+        dropDownController.rebuildList.value =
+            !dropDownController.rebuildList.value;
+      });
+      //});
+    });
     super.initState();
   }
 
@@ -43,9 +83,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       name = shared.toString();
     });
   }
-
-  final ValueNotifier<String> dropDownValue = ValueNotifier('ALL');
-  final ValueNotifier<String> customDropDownValue = ValueNotifier('THIS WEEK');
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) => AddTransactionScreen(
-                          type: ScreenType.addScreen,
+                          type: ScreenAction.addScreen,
                         ),
                       ),
                     );
@@ -134,39 +171,44 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'TRANSACTIONS',
                           style: appLargeTextStyle,
                         ),
-                        ValueListenableBuilder(
-                          builder: (BuildContext context, String value,
-                              Widget? child) {
-                            return DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                alignment: Alignment.centerRight,
-                                elevation: 16,
-                                value: dropDownValue.value,
-                                items: <String>[
-                                  'ALL',
-                                  'INCOME',
-                                  'EXPENSE',
-                                ]
-                                    .map<DropdownMenuItem<String>>(
-                                      (String value) =>
-                                          DropdownMenuItem<String>(
-                                        value: value,
-                                        child: Text(
-                                          value,
-                                          style: appLargeTextStyle,
-                                        ),
+                        Obx(
+                          () => DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              alignment: Alignment.centerRight,
+                              elevation: 16,
+                              value: dropDownController.dropDownValue.value,
+                              items: <String>[
+                                'ALL',
+                                'INCOME',
+                                'EXPENSE',
+                              ]
+                                  .map<DropdownMenuItem<String>>(
+                                    (String value) => DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(
+                                        value,
+                                        style: appLargeTextStyle,
                                       ),
-                                    )
-                                    .toList(),
-                                onChanged: (String? newValue) {
-                                  dropDownValue.value = newValue ?? '';
-                                  setState(() {});
-                                },
-                              ),
-                            );
-                          },
-                          valueListenable: dropDownValue,
-                        )
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (String? newValue) async {
+                                dropDownController.foundData.value =
+                                    dropDownController.allData;
+                                dropDownController.dropDownValue.value =
+                                    newValue!;
+                                await dropDownController.allFilter(
+                                    tabController: tabController);
+                                if (tabController.index == 2) {
+                                  await dropDownController.customFilter(
+                                      tabController: tabController);
+                                }
+                                dropDownController.rebuildList.value =
+                                    !dropDownController.rebuildList.value;
+                              },
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     sBoxH10,
@@ -174,6 +216,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               ),
               TabBar(
+                onTap: (value) {
+                  dropDownController.foundData.value =
+                      dropDownController.allData;
+
+                  tabController.index == 2
+                      ? dropDownController.customFilter(
+                          tabController: tabController)
+                      : dropDownController.allFilter(
+                          tabController: tabController);
+
+                  dropDownController.rebuildList.value =
+                      !dropDownController.rebuildList.value;
+                },
                 indicatorColor: mainColor,
                 controller: tabController,
                 tabs: [
@@ -198,33 +253,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
               //Tab bar view
-              Expanded(
-                child: TabBarView(
-                  controller: tabController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    //ALL
-                    AllTransactionList(
-                      valueListenable: allFilter(tabController: tabController),
-                    ),
-                    //TODAY
-                    TodayTransactionList(
-                      valueListenable:
-                          todayFilter(tabController: tabController),
-                    ),
-                    //THIS WEEK
-                    ValueListenableBuilder(
-                      builder:
-                          (BuildContext context, String value, Widget? child) {
-                        return CustomTransactionList(
-                          customDropDownValue: customDropDownValue,
-                          valueListenable: customFilter(),
-                          dropDownValue: dropDownValue,
-                        );
-                      },
-                      valueListenable: customDropDownValue,
-                    ),
-                  ],
+              Obx(
+                () => Expanded(
+                  child: dropDownController.rebuildList.value
+                      ? tabbarView()
+                      : tabbarView(),
                 ),
               ),
             ],
@@ -234,54 +267,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  allFilter({required TabController tabController}) {
-    if (dropDownValue.value == 'ALL') {
-      return TransactionDbFunctions.allTransactionNotifier;
-    } else if (dropDownValue.value == 'INCOME') {
-      return TransactionDbFunctions.incomeTransactionNotifier;
-    } else if (dropDownValue.value == 'EXPENSE') {
-      return TransactionDbFunctions.expenseTransactionNotifier;
-    }
+  TabBarView tabbarView() {
+    return TabBarView(
+      controller: tabController,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        //ALL
+        all(),
+        //TODAY
+        today(),
+        //THIS WEEK
+        custom(),
+      ],
+    );
   }
 
-  todayFilter({required TabController tabController}) {
-    if (dropDownValue.value == 'ALL') {
-      return TransactionDbFunctions.todayTransactionNotifier;
-    } else if (dropDownValue.value == 'INCOME') {
-      return TransactionDbFunctions.todayIncomeNotifier;
-    } else if (dropDownValue.value == 'EXPENSE') {
-      return TransactionDbFunctions.todayExpenseNotifier;
-    }
+  TodayTransactionList today() {
+    return TodayTransactionList(
+      foundData: dropDownController.foundData,
+      tabController: tabController,
+    );
   }
 
-  customFilter() {
-    if (dropDownValue.value == 'ALL' &&
-        customDropDownValue.value == 'THIS WEEK') {
-      return TransactionDbFunctions.instance.thisWeekAllNotifier;
-    } else if (dropDownValue.value == 'INCOME' &&
-        customDropDownValue.value == 'THIS WEEK') {
-      return TransactionDbFunctions.instance.thisWeekIncomeNotifier;
-    } else if (dropDownValue.value == 'EXPENSE' &&
-        customDropDownValue.value == 'THIS WEEK') {
-      return TransactionDbFunctions.instance.thisWeekExpenseNotifier;
-    } else if (dropDownValue.value == 'ALL' &&
-        customDropDownValue.value == 'THIS MONTH') {
-      return TransactionDbFunctions.instance.thisMonthAllNotifier;
-    } else if (dropDownValue.value == 'INCOME' &&
-        customDropDownValue.value == 'THIS MONTH') {
-      return TransactionDbFunctions.instance.thisMonthIncomeNotifier;
-    } else if (dropDownValue.value == 'EXPENSE' &&
-        customDropDownValue.value == 'THIS MONTH') {
-      return TransactionDbFunctions.instance.thisMonthExpenseNotifier;
-    } else if (dropDownValue.value == 'ALL' &&
-        customDropDownValue.value == 'THIS YEAR') {
-      return TransactionDbFunctions.instance.thisYearAllNotifier;
-    } else if (dropDownValue.value == 'INCOME' &&
-        customDropDownValue.value == 'THIS YEAR') {
-      return TransactionDbFunctions.instance.thisYearIncomeNotifier;
-    } else if (dropDownValue.value == 'EXPENSE' &&
-        customDropDownValue.value == 'THIS YEAR') {
-      return TransactionDbFunctions.instance.thisYearExpenseNotifier;
-    }
+  AllTransactionList all() {
+    return AllTransactionList(
+      foundData: dropDownController.foundData,
+      tabController: tabController,
+    );
+  }
+
+  CustomTransactionList custom() {
+    return CustomTransactionList(
+      tabController: tabController,
+      foundData: dropDownController.foundData,
+    );
   }
 }

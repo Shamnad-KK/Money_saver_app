@@ -19,7 +19,7 @@ class TransactionModalAdapter extends TypeAdapter<TransactionModal> {
     return TransactionModal(
       amount: fields[4] as num,
       id: fields[0] as String,
-      name: fields[1] as String,
+      categoryModal: fields[1] as CategoryModal,
       date: fields[2] as DateTime,
       type: fields[3] as CategoryType,
     );
@@ -32,7 +32,7 @@ class TransactionModalAdapter extends TypeAdapter<TransactionModal> {
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.name)
+      ..write(obj.categoryModal)
       ..writeByte(2)
       ..write(obj.date)
       ..writeByte(3)
