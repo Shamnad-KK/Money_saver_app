@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/database/models/category_model/category_model.dart';
 import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
@@ -24,6 +26,10 @@ Future<void> main() async {
   runApp(
     const MyApp(),
   );
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 }
 
 class MyApp extends StatelessWidget {
@@ -46,7 +52,8 @@ class MyApp extends StatelessWidget {
             title: 'Flutter Demo',
             theme: ThemeData(
               primarySwatch: Colors.blue,
-              fontFamily: 'Poppins',
+              textTheme:
+                  GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
               scaffoldBackgroundColor: bgColor,
             ),
             debugShowCheckedModeBanner: false,

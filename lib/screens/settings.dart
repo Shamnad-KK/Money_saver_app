@@ -112,7 +112,7 @@ class _SettingScreenState extends State<SettingScreen>
               ),
               Center(
                 child: Text(
-                  'v.1.0.0',
+                  'v.1.0.1',
                   style: appBodyTextStyle,
                 ),
               ),
@@ -164,7 +164,9 @@ class _SettingScreenState extends State<SettingScreen>
   }
 
   void _share() async {
-    Share.share('Check out Money manager app');
+    Share.share(
+      'Check out Money Saver for recording your transactions, https://play.google.com/store/apps/details?id=in.shamnad.money_manager',
+    );
   }
 
   void _aboutDialogue() {
@@ -222,7 +224,7 @@ class _SettingScreenState extends State<SettingScreen>
                                     width: 5.w,
                                   ),
                                   Text(
-                                    'v.1.0.0',
+                                    'v.1.0.1',
                                     style: TextStyle(fontSize: 14.sp),
                                   ),
                                 ],
