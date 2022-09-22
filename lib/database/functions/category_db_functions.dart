@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/constants/constants.dart';
-import 'package:money_manager/database/models/category_model/category_model.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/category/category_model.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 
 class CategoryDbFunctions {
   static final ValueNotifier<List<CategoryModal>> incomeModalNotifier =

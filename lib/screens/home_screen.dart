@@ -1,21 +1,21 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/getx/get_x.dart';
+import 'package:money_manager/providers/dropdown_provider.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
 import 'package:money_manager/screens/search_screen.dart';
-import 'package:money_manager/widgets/all_transaction_list.dart';
+import 'package:money_manager/widgets/all_transaction_list_widget.dart';
 import 'package:money_manager/widgets/home_card_widget.dart';
 import 'package:money_manager/widgets/this_week_transctn_list.dart';
 import 'package:money_manager/widgets/today_trasaction_list.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../database/models/transaction_model/transaction_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -26,52 +26,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late TabController tabController;
-  late DropDownController dropDownController;
   String name = '';
 
-  filter() async {
-    await dropDownController.allFilter(tabController: tabController);
-    dropDownController.rebuildList.value =
-        !dropDownController.rebuildList.value;
-    await dropDownController.customFilter(tabController: tabController);
-  }
-
-  late final List<TransactionModal> allData;
-
   initialise() async {
-    allData = TransactionDbFunctions.allTransactionNotifier.value;
     await TransactionDbFunctions().refreshUi();
-    dropDownController.foundData.value = allData;
-    dropDownController.rebuildList.value =
-        !dropDownController.rebuildList.value;
   }
 
   @override
   void initState() {
     tabController = TabController(length: 3, vsync: this);
-    dropDownController = Get.put(DropDownController());
     saveName();
-    CategoryDbFunctions().refreshUi();
 
-    // Future.delayed(const Duration(milliseconds: 500), () {
-    // setState(() {
-    //dropDownController.foundData.value = dropDownController.allData;
-    // dropDownController.rebuildList.value =
-    //     !dropDownController.rebuildList.value;
-    //});
-    // });
-    initialise();
-    TransactionDbFunctions().refreshUi();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      filter();
-      //Future.delayed(const Duration(milliseconds: 300), () {
-      setState(() {
-        dropDownController.foundData.value = dropDownController.allData;
-        dropDownController.rebuildList.value =
-            !dropDownController.rebuildList.value;
-      });
-      //});
-    });
     super.initState();
   }
 
@@ -86,6 +51,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final dropDownController =
+        Provider.of<DropDownProvider>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      initialise();
+      CategoryDbFunctions().refreshUi();
+    });
+    log("build called");
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (context, value) {
@@ -171,43 +143,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'TRANSACTIONS',
                           style: appLargeTextStyle,
                         ),
-                        Obx(
-                          () => DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              alignment: Alignment.centerRight,
-                              elevation: 16,
-                              value: dropDownController.dropDownValue.value,
-                              items: <String>[
-                                'ALL',
-                                'INCOME',
-                                'EXPENSE',
-                              ]
-                                  .map<DropdownMenuItem<String>>(
-                                    (String value) => DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: appLargeTextStyle,
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (String? newValue) async {
-                                dropDownController.foundData.value =
-                                    dropDownController.allData;
-                                dropDownController.dropDownValue.value =
-                                    newValue!;
-                                await dropDownController.allFilter(
-                                    tabController: tabController);
-                                if (tabController.index == 2) {
-                                  await dropDownController.customFilter(
-                                      tabController: tabController);
-                                }
-                                dropDownController.rebuildList.value =
-                                    !dropDownController.rebuildList.value;
-                              },
-                            ),
-                          ),
+                        Consumer<DropDownProvider>(
+                          builder:
+                              (BuildContext context, value, Widget? child) {
+                            return value.homeDrop(tabController);
+                          },
                         ),
                       ],
                     ),
@@ -217,17 +157,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               TabBar(
                 onTap: (value) {
-                  dropDownController.foundData.value =
-                      dropDownController.allData;
+                  dropDownController.foundData = dropDownController.allData;
 
                   tabController.index == 2
                       ? dropDownController.customFilter(
                           tabController: tabController)
                       : dropDownController.allFilter(
                           tabController: tabController);
-
-                  dropDownController.rebuildList.value =
-                      !dropDownController.rebuildList.value;
                 },
                 indicatorColor: mainColor,
                 controller: tabController,
@@ -252,54 +188,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              //Tab bar view
-              Obx(
-                () => Expanded(
-                  child: dropDownController.rebuildList.value
-                      ? tabbarView()
-                      : tabbarView(),
-                ),
-              ),
+              Expanded(
+                  child: TabBarView(
+                controller: tabController,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  AllTransactionList(
+                    tabController: tabController,
+                  ),
+                  TodayTransactionList(
+                    tabController: tabController,
+                  ),
+                  CustomTransactionList(
+                    tabController: tabController,
+                  ),
+                ],
+              )),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  TabBarView tabbarView() {
-    return TabBarView(
-      controller: tabController,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
-        //ALL
-        all(),
-        //TODAY
-        today(),
-        //THIS WEEK
-        custom(),
-      ],
-    );
-  }
-
-  TodayTransactionList today() {
-    return TodayTransactionList(
-      foundData: dropDownController.foundData,
-      tabController: tabController,
-    );
-  }
-
-  AllTransactionList all() {
-    return AllTransactionList(
-      foundData: dropDownController.foundData,
-      tabController: tabController,
-    );
-  }
-
-  CustomTransactionList custom() {
-    return CustomTransactionList(
-      tabController: tabController,
-      foundData: dropDownController.foundData,
     );
   }
 }

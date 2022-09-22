@@ -1,4 +1,4 @@
-import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
+import 'package:money_manager/models/transaction/transaction_model.dart';
 
 class ChartData {
   final String name;

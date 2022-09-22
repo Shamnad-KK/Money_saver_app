@@ -4,15 +4,15 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/database/models/category_model/category_model.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
-import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
+import 'package:money_manager/models/category/category_model.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:money_manager/widgets/bottom_navbar.dart';
-import 'package:money_manager/widgets/button.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_manager/widgets/custom_button.dart';
 
 enum ScreenAction {
   addScreen,
@@ -42,7 +42,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   DateTime? _selectedDate;
   final TextEditingController amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
-  List<CategoryModal> names = CategoryDbFunctions.allCategoryNotifier.value;
+  //List<CategoryModal> names = CategoryDbFunctions.allCategoryNotifier.value;
 
   Future<void> _showDate() async {
     final DateTime? result = await showDatePicker(
@@ -297,7 +297,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     ),
                   ),
                 ),
-                LargeButton(
+                CustomButton(
                   text: 'Save',
                   ontap: () async {
                     if (formKey.currentState!.validate()) {

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
-import 'package:money_manager/database/models/category_model/category_model.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
 import 'package:money_manager/helpers/colors.dart';
-import 'package:money_manager/widgets/add_expense_category.dart';
-import 'package:money_manager/widgets/add_income_category.dart';
+import 'package:money_manager/models/category/category_model.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
+import 'package:money_manager/widgets/category_exp_tabview_widget.dart';
+import 'package:money_manager/widgets/category_inc_tabview_widget.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 
 class AddCategoryScreen extends StatefulWidget {

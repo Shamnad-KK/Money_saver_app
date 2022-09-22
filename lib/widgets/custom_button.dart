@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:money_manager/helpers/colors.dart';
 
-class LargeButton extends StatelessWidget {
-  const LargeButton({Key? key, required this.text, required this.ontap})
+class CustomButton extends StatelessWidget {
+  const CustomButton({Key? key, required this.text, required this.ontap})
       : super(key: key);
   final String text;
   final VoidCallback ontap;

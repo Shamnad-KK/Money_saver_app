@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:money_manager/constants/constants.dart';
-import 'package:money_manager/getx/get_x.dart';
+import 'package:money_manager/providers/dropdown_provider.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/statistics_sort/stats_sort.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
@@ -26,13 +25,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   void initState() {
     tabController = TabController(length: 3, vsync: this);
 
-    dropDownController.foundData.value = dropDownController.allData;
+    dropDownController.foundData = dropDownController.allData;
 
     super.initState();
   }
 
   String dropDownValue = 'ALL';
-  final DropDownController dropDownController = Get.find();
+  late DropDownProvider dropDownController;
 
   @override
   Widget build(BuildContext context) {
@@ -50,42 +49,39 @@ class _StatisticsScreenState extends State<StatisticsScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Obx(
-              () => DropdownButtonHideUnderline(
-                child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: blackColor,
-                        ),
-                        borderRadius: BorderRadius.circular(
-                          10.r,
-                        ),
+            DropdownButtonHideUnderline(
+              child: DropdownButtonFormField<String>(
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: blackColor,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        10.r,
                       ),
                     ),
-                    value: dropDownController.statsDropDownValue.value,
-                    items: ['ALL', 'TODAY', '7 DAYS', '30 DAYS']
-                        .map(
-                          (String value) => DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (String? newValue) async {
-                      dropDownController.foundData.value =
-                          dropDownController.allData;
-                      dropDownController.statsDropDownValue.value = newValue!;
-                      await dropDownController.statsFilter(
-                          tabController: tabController);
-                    }),
-              ),
+                  ),
+                  value: dropDownController.statsDropDownValue,
+                  items: ['ALL', 'TODAY', '7 DAYS', '30 DAYS']
+                      .map(
+                        (String value) => DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (String? newValue) async {
+                    dropDownController.foundData = dropDownController.allData;
+                    dropDownController.statsDropDownValue = newValue!;
+                    await dropDownController.statsFilter(
+                        tabController: tabController);
+                  }),
             ),
             sBoxH30,
             TabBar(
               onTap: (value) {
-                dropDownController.foundData.value = dropDownController.allData;
+                dropDownController.foundData = dropDownController.allData;
                 chartSort(dropDownController.statsFilter(
                     tabController: tabController));
               },
@@ -132,15 +128,71 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                 controller: tabController,
                 children: [
                   //overview
-                  Obx(
-                    () => dropDownController.foundData.isNotEmpty
-                        ? SfCircularChart(
-                            legend: Legend(
-                              isResponsive: true,
-                              isVisible: true,
+                  dropDownController.foundData.isNotEmpty
+                      ? SfCircularChart(
+                          legend: Legend(
+                            isResponsive: true,
+                            isVisible: true,
+                          ),
+                          series: <CircularSeries>[
+                            PieSeries<ChartData, String>(
+                              explode: true,
+                              explodeGesture: ActivationMode.longPress,
+                              dataLabelSettings: const DataLabelSettings(
+                                isVisible: true,
+                              ),
+                              dataSource: chartSort(dropDownController
+                                  .statsFilter(tabController: tabController)),
+                              xValueMapper: (ChartData transaction, _) =>
+                                  transaction.name,
+                              yValueMapper: (ChartData transaction, _) =>
+                                  transaction.amount,
                             ),
-                            series: <CircularSeries>[
-                              PieSeries<ChartData, String>(
+                          ],
+                        )
+                      : const Center(
+                          child: Text(
+                            'No Transactions to display',
+                          ),
+                        ),
+
+                  //income
+                  dropDownController.foundData.isNotEmpty
+                      ? SfCircularChart(
+                          legend: Legend(
+                            isResponsive: true,
+                            isVisible: true,
+                          ),
+                          series: <CircularSeries>[
+                            PieSeries<ChartData, String>(
+                                explode: true,
+                                explodeGesture: ActivationMode.longPress,
+                                dataSource: chartSort(dropDownController
+                                    .statsFilter(tabController: tabController)),
+                                dataLabelSettings: const DataLabelSettings(
+                                  isVisible: true,
+                                ),
+                                xValueMapper: (ChartData transaction, _) =>
+                                    transaction.name,
+                                yValueMapper: (ChartData transaction, _) =>
+                                    transaction.amount),
+                          ],
+                        )
+                      : const Center(
+                          child: Text(
+                            'No Transactions to display',
+                          ),
+                        ),
+
+                  //expense
+                  dropDownController.foundData.isNotEmpty
+                      ? SfCircularChart(
+                          legend: Legend(
+                            isResponsive: true,
+                            isVisible: true,
+                          ),
+                          series: <CircularSeries>[
+                            PieSeries<ChartData, String>(
                                 explode: true,
                                 explodeGesture: ActivationMode.longPress,
                                 dataLabelSettings: const DataLabelSettings(
@@ -151,78 +203,14 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 xValueMapper: (ChartData transaction, _) =>
                                     transaction.name,
                                 yValueMapper: (ChartData transaction, _) =>
-                                    transaction.amount,
-                              ),
-                            ],
-                          )
-                        : const Center(
-                            child: Text(
-                              'No Transactions to display',
-                            ),
+                                    transaction.amount),
+                          ],
+                        )
+                      : const Center(
+                          child: Text(
+                            'No Transactions to display',
                           ),
-                  ),
-
-                  //income
-                  Obx(
-                    () => dropDownController.foundData.isNotEmpty
-                        ? SfCircularChart(
-                            legend: Legend(
-                              isResponsive: true,
-                              isVisible: true,
-                            ),
-                            series: <CircularSeries>[
-                              PieSeries<ChartData, String>(
-                                  explode: true,
-                                  explodeGesture: ActivationMode.longPress,
-                                  dataSource: chartSort(
-                                      dropDownController.statsFilter(
-                                          tabController: tabController)),
-                                  dataLabelSettings: const DataLabelSettings(
-                                    isVisible: true,
-                                  ),
-                                  xValueMapper: (ChartData transaction, _) =>
-                                      transaction.name,
-                                  yValueMapper: (ChartData transaction, _) =>
-                                      transaction.amount),
-                            ],
-                          )
-                        : const Center(
-                            child: Text(
-                              'No Transactions to display',
-                            ),
-                          ),
-                  ),
-
-                  //expense
-                  Obx(
-                    () => dropDownController.foundData.isNotEmpty
-                        ? SfCircularChart(
-                            legend: Legend(
-                              isResponsive: true,
-                              isVisible: true,
-                            ),
-                            series: <CircularSeries>[
-                              PieSeries<ChartData, String>(
-                                  explode: true,
-                                  explodeGesture: ActivationMode.longPress,
-                                  dataLabelSettings: const DataLabelSettings(
-                                    isVisible: true,
-                                  ),
-                                  dataSource: chartSort(
-                                      dropDownController.statsFilter(
-                                          tabController: tabController)),
-                                  xValueMapper: (ChartData transaction, _) =>
-                                      transaction.name,
-                                  yValueMapper: (ChartData transaction, _) =>
-                                      transaction.amount),
-                            ],
-                          )
-                        : const Center(
-                            child: Text(
-                              'No Transactions to display',
-                            ),
-                          ),
-                  ),
+                        ),
                 ],
               ),
             ),

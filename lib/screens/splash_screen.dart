@@ -6,22 +6,14 @@ import 'package:money_manager/helpers/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/helpers/text_style.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatelessWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
-
-class _SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    gotoLogin();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      gotoLogin(context);
+    });
     return Scaffold(
       backgroundColor: mainColor,
       body: SafeArea(
@@ -52,13 +44,11 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Future<void> gotoLogin() async {
+  Future<void> gotoLogin(BuildContext context) async {
     await Future.delayed(
       const Duration(seconds: 2),
     );
-    if (!mounted) {
-      return;
-    }
+
     await AuthController.checkSaved(context);
   }
 }

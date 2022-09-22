@@ -1,5 +1,5 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 part 'category_model.g.dart';
 
 @HiveType(typeId: 1)

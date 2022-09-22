@@ -1,39 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
-import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
-import 'package:money_manager/getx/get_x.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/transaction/transaction_model.dart';
+import 'package:money_manager/providers/dropdown_provider.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
+import 'package:provider/provider.dart';
 
 class TodayTransactionList extends StatelessWidget {
-  TodayTransactionList({
+  const TodayTransactionList({
     Key? key,
-    required this.foundData,
     required this.tabController,
   }) : super(key: key);
-  final RxList<TransactionModal> foundData;
   final TabController tabController;
 
-  final DropDownController dropDownController = Get.find();
   @override
   Widget build(BuildContext context) {
-    return Obx(() => dropDownController.foundData.isEmpty
+    final dropDownController = Provider.of<DropDownProvider>(context);
+    return dropDownController.foundData.isEmpty
         ? const Center(
             child: Center(
               child: Text('No Transactions'),
             ),
           )
-        : dropDownController.rebuildList.value
-            ? listView(dropDownController)
-            : listView(dropDownController));
+        : listView(dropDownController);
   }
 
-  ListView listView(DropDownController dropDownController) {
+  ListView listView(DropDownProvider dropDownController) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -49,7 +45,8 @@ class TodayTransactionList extends StatelessWidget {
                   bottomLeft: Radius.circular(5.r),
                 ),
                 onPressed: (context) {
-                  _showPopUp(dropDownController.foundData, index, context);
+                  _showPopUp(dropDownController, dropDownController.foundData,
+                      index, context);
                 },
                 backgroundColor: Colors.red,
                 label: 'Delete',
@@ -112,7 +109,7 @@ class TodayTransactionList extends StatelessWidget {
     );
   }
 
-  void _showPopUp(
+  void _showPopUp(DropDownProvider dropDownController,
       List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,

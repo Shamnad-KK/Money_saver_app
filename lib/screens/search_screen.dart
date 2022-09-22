@@ -3,10 +3,10 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/database/models/category_model/category_type_model/category_type_model.dart';
-import 'package:money_manager/database/models/transaction_model/transaction_model.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
