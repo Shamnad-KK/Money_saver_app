@@ -2,9 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
@@ -14,48 +15,32 @@ import 'package:money_manager/widgets/home_card_widget.dart';
 import 'package:money_manager/widgets/this_week_transctn_list.dart';
 import 'package:money_manager/widgets/today_trasaction_list.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  late TabController tabController;
-  String name = '';
-
-  initialise() async {
-    await TransactionDbFunctions().refreshUi();
-  }
-
-  @override
-  void initState() {
-    tabController = TabController(length: 3, vsync: this);
-    saveName();
-
-    super.initState();
-  }
-
-  Future<void> saveName() async {
-    final SharedPreferences sharedPreferences =
-        await SharedPreferences.getInstance();
-    final shared = sharedPreferences.getString(nameKey);
-    setState(() {
-      name = shared.toString();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final dropDownController =
-        Provider.of<DropDownProvider>(context, listen: false);
+    final authController = Provider.of<AuthController>(
+      context,
+      listen: false,
+    );
+    final dropDownController = Provider.of<DropDownController>(
+      context,
+      listen: false,
+    );
+    TabController tabController = TabController(
+      length: 3,
+      vsync: Scaffold.of(context),
+    );
+
+    authController.saveName();
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initialise();
+      TransactionDbFunctions().refreshUi();
       CategoryDbFunctions().refreshUi();
+      dropDownController.allFilter(tabController: tabController);
     });
     log("build called");
     return Scaffold(
@@ -101,9 +86,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               flexibleSpace: FlexibleSpaceBar(
                 centerTitle: true,
                 expandedTitleScale: 1,
-                title: Text(
-                  name.toUpperCase(),
-                ),
+                title: Consumer<AuthController>(
+                    builder: (BuildContext context, value, Widget? child) {
+                  return Text(
+                    value.name.toUpperCase(),
+                  );
+                }),
                 background: Container(
                   decoration: BoxDecoration(
                     color: mainColor,
@@ -143,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'TRANSACTIONS',
                           style: appLargeTextStyle,
                         ),
-                        Consumer<DropDownProvider>(
+                        Consumer<DropDownController>(
                           builder:
                               (BuildContext context, value, Widget? child) {
                             return value.homeDrop(tabController);

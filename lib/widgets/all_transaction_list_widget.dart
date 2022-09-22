@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
@@ -19,8 +19,8 @@ class AllTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DropDownProvider>(
-        builder: ((context, DropDownProvider value, child) {
+    return Consumer<DropDownController>(
+        builder: ((context, DropDownController value, child) {
       return value.foundData.isEmpty
           ? const Center(
               child: Center(
@@ -105,7 +105,7 @@ class AllTransactionList extends StatelessWidget {
     }));
   }
 
-  void _showPopUp(DropDownProvider dropDownController,
+  void _showPopUp(DropDownController dropDownController,
       List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,

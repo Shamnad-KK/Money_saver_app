@@ -6,11 +6,22 @@ import 'package:money_manager/screens/welcome_screen.dart';
 import 'package:money_manager/widgets/bottom_navbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthController {
+class AuthController extends ChangeNotifier {
+  String _name = '';
+  String get name => _name;
   static Future login({required String name}) async {
     final SharedPreferences sharedPreferences =
         await SharedPreferences.getInstance();
     sharedPreferences.setString(nameKey, name);
+  }
+
+  Future<void> saveName() async {
+    final SharedPreferences sharedPreferences =
+        await SharedPreferences.getInstance();
+    final shared = sharedPreferences.getString(nameKey);
+
+    _name = shared.toString();
+    notifyListeners();
   }
 
   static Future checkSaved(BuildContext context) async {

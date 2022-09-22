@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/statistics_sort/stats_sort.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
@@ -31,7 +31,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   }
 
   String dropDownValue = 'ALL';
-  late DropDownProvider dropDownController;
+  late DropDownController dropDownController;
 
   @override
   Widget build(BuildContext context) {

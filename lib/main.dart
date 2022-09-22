@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/models/category/category_model.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
-import 'package:money_manager/providers/category_db_provider.dart';
-import 'package:money_manager/providers/transaction_db_provider.dart';
+import 'package:money_manager/controllers/category_controller.dart';
+import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/screens/splash_screen.dart';
 import 'package:money_manager/widgets/scroll_behaviour.dart';
 import 'package:provider/provider.dart';
@@ -48,9 +49,10 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, Widget? child) {
           return MultiProvider(
             providers: [
-              ChangeNotifierProvider(create: (ctx) => DropDownProvider()),
+              ChangeNotifierProvider(create: (ctx) => AuthController()),
+              ChangeNotifierProvider(create: (ctx) => DropDownController()),
               ChangeNotifierProvider(create: (ctx) => TransactionDbProvider()),
-              ChangeNotifierProvider(create: (ctx) => CategoryDBProvider()),
+              ChangeNotifierProvider(create: (ctx) => CategoryDBController()),
             ],
             child: MaterialApp(
               builder: (context, Widget? child) {

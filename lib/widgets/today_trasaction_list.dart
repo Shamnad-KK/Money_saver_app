@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
@@ -19,7 +19,7 @@ class TodayTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropDownController = Provider.of<DropDownProvider>(context);
+    final dropDownController = Provider.of<DropDownController>(context);
     return dropDownController.foundData.isEmpty
         ? const Center(
             child: Center(
@@ -29,7 +29,7 @@ class TodayTransactionList extends StatelessWidget {
         : listView(dropDownController);
   }
 
-  ListView listView(DropDownProvider dropDownController) {
+  ListView listView(DropDownController dropDownController) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -109,7 +109,7 @@ class TodayTransactionList extends StatelessWidget {
     );
   }
 
-  void _showPopUp(DropDownProvider dropDownController,
+  void _showPopUp(DropDownController dropDownController,
       List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,

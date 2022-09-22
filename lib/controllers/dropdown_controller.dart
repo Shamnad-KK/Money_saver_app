@@ -5,7 +5,7 @@ import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
 
-class DropDownProvider with ChangeNotifier {
+class DropDownController with ChangeNotifier {
   String dropDownValue = 'ALL';
   String customDropDownValue = 'ONE WEEK';
   String statsDropDownValue = 'ALL';

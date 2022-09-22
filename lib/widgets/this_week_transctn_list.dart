@@ -5,7 +5,7 @@ import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
-import 'package:money_manager/providers/dropdown_provider.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +21,7 @@ class CustomTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropDownController = Provider.of<DropDownProvider>(context);
+    final dropDownController = Provider.of<DropDownController>(context);
     return Column(
       children: [
         sBoxH10,
@@ -68,7 +68,7 @@ class CustomTransactionList extends StatelessWidget {
     );
   }
 
-  Expanded listView(DropDownProvider dropDownController) {
+  Expanded listView(DropDownController dropDownController) {
     return Expanded(
       child: ListView.builder(
         shrinkWrap: true,
@@ -151,7 +151,7 @@ class CustomTransactionList extends StatelessWidget {
     );
   }
 
-  void _showPopUp(DropDownProvider dropDownController,
+  void _showPopUp(DropDownController dropDownController,
       List<TransactionModal> value, int index, BuildContext context) {
     showDialog(
       context: context,
