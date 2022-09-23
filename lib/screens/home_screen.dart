@@ -3,13 +3,14 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
+import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
-import 'package:money_manager/database/functions/transaction_db_functions.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
 import 'package:money_manager/screens/search_screen.dart';
+import 'package:money_manager/constants/enums.dart';
 import 'package:money_manager/widgets/all_transaction_list_widget.dart';
 import 'package:money_manager/widgets/home_card_widget.dart';
 import 'package:money_manager/widgets/this_week_transctn_list.dart';
@@ -26,6 +27,10 @@ class HomeScreen extends StatelessWidget {
       context,
       listen: false,
     );
+    final transactionController = Provider.of<TransactionController>(
+      context,
+      listen: false,
+    );
     final dropDownController = Provider.of<DropDownController>(
       context,
       listen: false,
@@ -38,9 +43,11 @@ class HomeScreen extends StatelessWidget {
     authController.saveName();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      TransactionDbFunctions().refreshUi();
+      transactionController.refreshUi();
       CategoryDbFunctions().refreshUi();
+
       dropDownController.allFilter(tabController: tabController);
+      dropDownController.customFilter(tabController: tabController);
     });
     log("build called");
     return Scaffold(
@@ -71,7 +78,7 @@ class HomeScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => AddTransactionScreen(
+                        builder: (context) => const AddTransactionScreen(
                           type: ScreenAction.addScreen,
                         ),
                       ),
@@ -112,7 +119,12 @@ class HomeScreen extends StatelessWidget {
           ];
         },
         body: Container(
-          padding: EdgeInsets.fromLTRB(20.w, 20.h, 20.w, 20.h),
+          padding: EdgeInsets.fromLTRB(
+            20.w,
+            20.h,
+            20.w,
+            20.h,
+          ),
           child: Column(
             children: [
               Container(
@@ -145,7 +157,7 @@ class HomeScreen extends StatelessWidget {
               ),
               TabBar(
                 onTap: (value) {
-                  dropDownController.foundData = dropDownController.allData;
+                  // dropDownController.foundData = dropDownController.allData;
 
                   tabController.index == 2
                       ? dropDownController.customFilter(

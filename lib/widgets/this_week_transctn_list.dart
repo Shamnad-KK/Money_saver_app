@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
-import 'package:money_manager/database/functions/transaction_db_functions.dart';
-import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
-import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
+import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
+import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
+import 'package:money_manager/constants/enums.dart';
 import 'package:provider/provider.dart';
 
 class CustomTransactionList extends StatelessWidget {
@@ -153,6 +154,10 @@ class CustomTransactionList extends StatelessWidget {
 
   void _showPopUp(DropDownController dropDownController,
       List<TransactionModal> value, int index, BuildContext context) {
+    final transactionController = Provider.of<TransactionController>(
+      context,
+      listen: false,
+    );
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -168,7 +173,7 @@ class CustomTransactionList extends StatelessWidget {
                     value[index].delete().whenComplete(() => dropDownController
                         .customFilter(tabController: tabController));
 
-                    TransactionDbFunctions().refreshUi();
+                    transactionController.refreshUi();
                   });
 
                   ScaffoldMessenger.of(context).showSnackBar(

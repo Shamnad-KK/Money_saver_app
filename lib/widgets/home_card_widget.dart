@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/database/functions/transaction_db_functions.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/widgets/home_amount_type.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class HomeCardWidget extends StatelessWidget {
   const HomeCardWidget({
@@ -27,18 +28,21 @@ class HomeCardWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          ValueListenableBuilder(
-            builder: (BuildContext context, num value, Widget? child) {
+          Consumer<TransactionController>(
+            builder:
+                (BuildContext context, transactionController, Widget? child) {
               return Column(
                 children: [
                   Text(
-                    value.round() < 0 ? 'LOSS' : 'CURRENT BALANCE',
+                    transactionController.currentBalance.round() < 0
+                        ? 'LOSS'
+                        : 'CURRENT BALANCE',
                     style: TextStyle(fontSize: 24.sp),
                   ),
                   FittedBox(
                     child: Text(
-                      ' ${value.round()}',
-                      style: value.round() < 0
+                      ' ${transactionController.currentBalance.round()}',
+                      style: transactionController.currentBalance.round() < 0
                           ? homeBoldLossAmountStyle
                           : homeBoldAmountStyle,
                     ),
@@ -46,7 +50,6 @@ class HomeCardWidget extends StatelessWidget {
                 ],
               );
             },
-            valueListenable: TransactionDbFunctions.currentBalance,
           ),
           Padding(
             padding: EdgeInsets.only(
@@ -66,31 +69,29 @@ class HomeCardWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Flexible(
-                      child: ValueListenableBuilder(
-                        builder:
-                            (BuildContext context, num value, Widget? child) {
+                      child: Consumer<TransactionController>(
+                        builder: (BuildContext context, transactionController,
+                            Widget? child) {
                           return FittedBox(
                             child: Text(
-                              '₹ ${value.round()}',
+                              '₹ ${transactionController.totalIncome.round()}',
                               style: homeLargeAmountStyle,
                             ),
                           );
                         },
-                        valueListenable: TransactionDbFunctions.totalIncome,
                       ),
                     ),
                     Flexible(
-                      child: ValueListenableBuilder(
-                        builder:
-                            (BuildContext context, num value, Widget? child) {
+                      child: Consumer<TransactionController>(
+                        builder: (BuildContext context, transactionController,
+                            Widget? child) {
                           return FittedBox(
                             child: Text(
-                              '₹ ${value.round()}',
+                              '₹ ${transactionController.totalExpense.round()}',
                               style: homeLargeAmountStyle,
                             ),
                           );
                         },
-                        valueListenable: TransactionDbFunctions.totalExpense,
                       ),
                     )
                   ],

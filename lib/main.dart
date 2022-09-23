@@ -51,7 +51,7 @@ class MyApp extends StatelessWidget {
             providers: [
               ChangeNotifierProvider(create: (ctx) => AuthController()),
               ChangeNotifierProvider(create: (ctx) => DropDownController()),
-              ChangeNotifierProvider(create: (ctx) => TransactionDbProvider()),
+              ChangeNotifierProvider(create: (ctx) => TransactionController()),
               ChangeNotifierProvider(create: (ctx) => CategoryDBController()),
             ],
             child: MaterialApp(

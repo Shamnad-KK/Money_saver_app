@@ -13,7 +13,7 @@ class DropDownController with ChangeNotifier {
   List<TransactionModal> foundData = [];
 
   List<TransactionModal> allData =
-      TransactionDbFunctions.allTransactionNotifier.value;
+      TransactionDbFunctions.allTransactionNotifier;
 
   Widget homeDrop(TabController tabController) {
     return DropdownButtonHideUnderline(
@@ -230,6 +230,5 @@ class DropDownController with ChangeNotifier {
     }
     foundData = results;
     notifyListeners();
-    return foundData;
   }
 }

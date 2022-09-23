@@ -19,7 +19,7 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   List<TransactionModal> transactionModel =
-      TransactionDbFunctions.allTransactionNotifier.value;
+      TransactionDbFunctions.allTransactionNotifier;
 
   List<TransactionModal> foundList = [];
 
@@ -169,8 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
               onPressed: () {
                 TransactionDbFunctions().deleteTransaction(value[index].id);
                 setState(() {
-                  TransactionDbFunctions.allTransactionNotifier.value
-                      .removeAt(index);
+                  TransactionDbFunctions.allTransactionNotifier.removeAt(index);
                 });
 
                 ScaffoldMessenger.of(context).showSnackBar(
