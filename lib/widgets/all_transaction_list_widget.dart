@@ -21,89 +21,90 @@ class AllTransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<DropDownController>(
-        builder: ((context, DropDownController value, child) {
-      return value.foundData.isEmpty
-          ? const Center(
-              child: Center(
-                child: Text('No Transactions'),
-              ),
-            )
-          : ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Slidable(
-                  startActionPane: ActionPane(
-                    motion: const DrawerMotion(),
-                    extentRatio: 1,
-                    children: [
-                      SlidableAction(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(5.r),
-                          bottomLeft: Radius.circular(5.r),
-                        ),
-                        onPressed: (context) {
-                          _showPopUp(value, value.foundData, index, context);
-                        },
-                        backgroundColor: Colors.red,
-                        label: 'Delete',
-                        icon: Icons.delete,
-                      ),
-                      SlidableAction(
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(5.r),
-                          bottomRight: Radius.circular(5.r),
-                        ),
-                        onPressed: (context) {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (ctx) => AddTransactionScreen(
-                                type: ScreenAction.editScreen,
-                                transactionModal: value.foundData[index],
-                              ),
-                            ),
-                          );
-                        },
-                        backgroundColor: Colors.blueGrey,
-                        label: 'Edit',
-                        icon: Icons.edit,
-                      )
-                    ],
-                  ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(0),
-                    leading: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+      builder: (context, DropDownController value, child) {
+        return value.foundData.isEmpty
+            ? const Center(
+                child: Center(
+                  child: Text('No Transactions'),
+                ),
+              )
+            : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Slidable(
+                    startActionPane: ActionPane(
+                      motion: const DrawerMotion(),
+                      extentRatio: 1,
                       children: [
-                        Icon(
-                          value.foundData[index].type == CategoryType.income
-                              ? Icons.arrow_circle_up
-                              : Icons.arrow_circle_down,
-                          color:
-                              value.foundData[index].type == CategoryType.income
-                                  ? Colors.green
-                                  : Colors.red,
+                        SlidableAction(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(5.r),
+                            bottomLeft: Radius.circular(5.r),
+                          ),
+                          onPressed: (context) {
+                            _showPopUp(value, value.foundData, index, context);
+                          },
+                          backgroundColor: Colors.red,
+                          label: 'Delete',
+                          icon: Icons.delete,
                         ),
+                        SlidableAction(
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(5.r),
+                            bottomRight: Radius.circular(5.r),
+                          ),
+                          onPressed: (context) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (ctx) => AddTransactionScreen(
+                                  type: ScreenAction.editScreen,
+                                  transactionModal: value.foundData[index],
+                                ),
+                              ),
+                            );
+                          },
+                          backgroundColor: Colors.blueGrey,
+                          label: 'Edit',
+                          icon: Icons.edit,
+                        )
                       ],
                     ),
-                    title: Text(
-                      value.foundData[index].categoryModal.name,
-                      style: appBodyTextStyle,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(0),
+                      leading: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            value.foundData[index].type == CategoryType.income
+                                ? Icons.arrow_circle_up
+                                : Icons.arrow_circle_down,
+                            color: value.foundData[index].type ==
+                                    CategoryType.income
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ],
+                      ),
+                      title: Text(
+                        value.foundData[index].categoryModal.name,
+                        style: appBodyTextStyle,
+                      ),
+                      trailing: Text(
+                        '₹${value.foundData[index].amount.round()}',
+                        style: homeAmountStyle,
+                      ),
+                      subtitle: Text(
+                        DateFormat.yMMMMd().format(value.foundData[index].date),
+                        style: homeDateStyle,
+                      ),
                     ),
-                    trailing: Text(
-                      '₹${value.foundData[index].amount.round()}',
-                      style: homeAmountStyle,
-                    ),
-                    subtitle: Text(
-                      DateFormat.yMMMMd().format(value.foundData[index].date),
-                      style: homeDateStyle,
-                    ),
-                  ),
-                );
-              },
-              itemCount: value.foundData.length,
-            );
-    }));
+                  );
+                },
+                itemCount: value.foundData.length,
+              );
+      },
+    );
   }
 
   void _showPopUp(DropDownController dropDownController,
@@ -114,44 +115,36 @@ class AllTransactionList extends StatelessWidget {
     );
     showDialog(
       context: context,
-      builder: (BuildContext ctx) {
-        return StatefulBuilder(builder:
-            (BuildContext context, void Function(void Function()) setNewState) {
-          return AlertDialog(
-            title: const Text('Are you sure ?'),
-            content: const Text('Do you want to delete ?'),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  setNewState(
-                    () {
-                      value[index].delete().whenComplete(() =>
-                          dropDownController.allFilter(
-                              tabController: tabController));
-                      transactionController.refreshUi();
-                    },
-                  );
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Are you sure ?'),
+          content: const Text('Do you want to delete ?'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                value[index].delete().whenComplete(() =>
+                    dropDownController.allFilter(tabController: tabController));
+                transactionController.refreshUi();
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      duration: Duration(seconds: 1),
-                      content: Text('Transaction deleted'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Yes'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('No'),
-              ),
-            ],
-          );
-        });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    duration: Duration(seconds: 1),
+                    content: Text('Transaction deleted'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.of(context).pop();
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
       },
     );
   }

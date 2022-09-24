@@ -20,94 +20,89 @@ class TodayTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropDownController = Provider.of<DropDownController>(context);
-    return dropDownController.foundData.isEmpty
-        ? const Center(
-            child: Center(
-              child: Text('No Transactions'),
-            ),
-          )
-        : listView(dropDownController);
-  }
-
-  ListView listView(DropDownController dropDownController) {
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (context, index) {
-        return Slidable(
-          startActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            extentRatio: 1,
-            children: [
-              SlidableAction(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(5.r),
-                  bottomLeft: Radius.circular(5.r),
-                ),
-                onPressed: (context) {
-                  _showPopUp(dropDownController, dropDownController.foundData,
-                      index, context);
-                },
-                backgroundColor: Colors.red,
-                label: 'Delete',
-                icon: Icons.delete,
+    return Consumer<DropDownController>(
+        builder: (BuildContext context, value, Widget? child) {
+      return value.foundData.isEmpty
+          ? const Center(
+              child: Center(
+                child: Text('No Transactions'),
               ),
-              SlidableAction(
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(5.r),
-                    bottomRight: Radius.circular(5.r)),
-                onPressed: (context) {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (ctx) => AddTransactionScreen(
-                        type: ScreenAction.editScreen,
-                        transactionModal: dropDownController.foundData[index],
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Slidable(
+                  startActionPane: ActionPane(
+                    motion: const DrawerMotion(),
+                    extentRatio: 1,
+                    children: [
+                      SlidableAction(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5.r),
+                          bottomLeft: Radius.circular(5.r),
+                        ),
+                        onPressed: (context) {
+                          _showPopUp(value, value.foundData, index, context);
+                        },
+                        backgroundColor: Colors.red,
+                        label: 'Delete',
+                        icon: Icons.delete,
                       ),
+                      SlidableAction(
+                        borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(5.r),
+                            bottomRight: Radius.circular(5.r)),
+                        onPressed: (context) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (ctx) => AddTransactionScreen(
+                                type: ScreenAction.editScreen,
+                                transactionModal: value.foundData[index],
+                              ),
+                            ),
+                          );
+                        },
+                        backgroundColor: Colors.blueGrey,
+                        label: 'Edit',
+                        icon: Icons.edit,
+                      )
+                    ],
+                  ),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.all(0),
+                    leading: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          value.foundData[index].type == CategoryType.income
+                              ? Icons.arrow_circle_up
+                              : Icons.arrow_circle_down,
+                          color:
+                              value.foundData[index].type == CategoryType.income
+                                  ? Colors.green
+                                  : Colors.red,
+                        ),
+                      ],
                     ),
-                  );
-                },
-                backgroundColor: Colors.blueGrey,
-                label: 'Edit',
-                icon: Icons.edit,
-              )
-            ],
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(0),
-            leading: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  dropDownController.foundData[index].type ==
-                          CategoryType.income
-                      ? Icons.arrow_circle_up
-                      : Icons.arrow_circle_down,
-                  color: dropDownController.foundData[index].type ==
-                          CategoryType.income
-                      ? Colors.green
-                      : Colors.red,
-                ),
-              ],
-            ),
-            title: Text(
-              dropDownController.foundData[index].categoryModal.name,
-              style: appBodyTextStyle,
-            ),
-            trailing: Text(
-              '₹ ${dropDownController.foundData[index].amount.round()}',
-              style: homeAmountStyle,
-            ),
-            subtitle: Text(
-              DateFormat.yMMMMd()
-                  .format(dropDownController.foundData[index].date),
-              style: homeDateStyle,
-            ),
-          ),
-        );
-      },
-      itemCount: dropDownController.foundData.length,
-    );
+                    title: Text(
+                      value.foundData[index].categoryModal.name,
+                      style: appBodyTextStyle,
+                    ),
+                    trailing: Text(
+                      '₹ ${value.foundData[index].amount.round()}',
+                      style: homeAmountStyle,
+                    ),
+                    subtitle: Text(
+                      DateFormat.yMMMMd().format(value.foundData[index].date),
+                      style: homeDateStyle,
+                    ),
+                  ),
+                );
+              },
+              itemCount: value.foundData.length,
+            );
+    });
   }
 
   void _showPopUp(DropDownController dropDownController,

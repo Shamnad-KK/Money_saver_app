@@ -35,13 +35,6 @@ class TransactionDbFunctions {
     return allTransactionNotifier;
   }
 
-  Future<void> deleteTransaction(String key) async {
-    final transactionDB =
-        await Hive.openBox<TransactionModal>(transactionDbName);
-    await transactionDB.delete(key);
-    await refreshUi();
-  }
-
   Future<void> deleteAllData() async {
     final transactionDB =
         await Hive.openBox<TransactionModal>(transactionDbName);

@@ -169,7 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                TransactionDbFunctions().deleteTransaction(value[index].id);
+                //   TransactionDbFunctions().deleteTransaction(value[index].id);
                 setState(() {
                   TransactionDbFunctions.allTransactionNotifier.removeAt(index);
                 });
