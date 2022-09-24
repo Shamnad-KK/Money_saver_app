@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/widgets/bottom_navbar.dart';

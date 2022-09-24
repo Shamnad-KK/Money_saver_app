@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/repository/database/transaction_db_functions.dart';
 import 'package:money_manager/helpers/colors.dart';
@@ -22,25 +22,13 @@ final Uri linkedinUrl =
 final Uri instaUrl = Uri.parse('https://www.instagram.com/shamnad_chemmu702/');
 final Uri gitUrl = Uri.parse('https://github.com/Shamnad-KK');
 
-class SettingScreen extends StatefulWidget {
+class SettingScreen extends StatelessWidget {
   const SettingScreen({Key? key}) : super(key: key);
 
   @override
-  State<SettingScreen> createState() => _SettingScreenState();
-}
-
-late TabController tabController;
-
-class _SettingScreenState extends State<SettingScreen>
-    with TickerProviderStateMixin {
-  @override
-  void initState() {
-    tabController = TabController(length: 2, vsync: this);
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    TabController tabController =
+        TabController(length: 2, vsync: Scaffold.of(context));
     return Scaffold(
       appBar: const AppBarWidget(
         leading: 'Settings',
@@ -95,7 +83,7 @@ class _SettingScreenState extends State<SettingScreen>
                           icon: Icons.info_outline,
                           text: 'About',
                           ontap: () {
-                            _aboutDialogue();
+                            _aboutDialogue(context, tabController);
                           },
                         ),
                         SettingsRowWidget(
@@ -169,7 +157,7 @@ class _SettingScreenState extends State<SettingScreen>
     );
   }
 
-  void _aboutDialogue() {
+  void _aboutDialogue(BuildContext context, TabController tabController) {
     showDialog(
         context: context,
         builder: (ctx) => Dialog(

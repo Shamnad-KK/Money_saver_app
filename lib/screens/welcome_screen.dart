@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/models/welcome_screen/welcome_screen_model.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';

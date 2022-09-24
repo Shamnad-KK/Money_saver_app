@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/controllers/search_controller.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/repository/database/transaction_db_functions.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
@@ -9,6 +10,7 @@ import 'package:money_manager/models/category/category_type_model/category_type_
 import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -18,37 +20,33 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<TransactionModal> transactionModel =
-      TransactionDbFunctions.allTransactionNotifier;
+  // List<TransactionModal> transactionModel =
+  //     TransactionDbFunctions.allTransactionNotifier;
 
-  List<TransactionModal> foundList = [];
+  // List<TransactionModal> foundList = [];
 
-  void runFilter(String enteredKeyword) {
-    List<TransactionModal> results = [];
-    if (enteredKeyword.isEmpty) {
-      results = transactionModel;
-    } else {
-      results = transactionModel
-          .where(
-            (element) => element.categoryModal.name.toLowerCase().contains(
-                  enteredKeyword.toLowerCase(),
-                ),
-          )
-          .toList();
-    }
-    setState(() {
-      foundList = results;
-    });
-  }
-
-  @override
-  void initState() {
-    foundList = transactionModel;
-    super.initState();
-  }
+  // void runFilter(String enteredKeyword) {
+  //   List<TransactionModal> results = [];
+  //   if (enteredKeyword.isEmpty) {
+  //     results = transactionModel;
+  //   } else {
+  //     results = transactionModel
+  //         .where(
+  //           (element) => element.categoryModal.name.toLowerCase().contains(
+  //                 enteredKeyword.toLowerCase(),
+  //               ),
+  //         )
+  //         .toList();
+  //   }
+  //   setState(() {
+  //     foundList = results;
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
+    final searchController =
+        Provider.of<SearchController>(context, listen: true);
     return Scaffold(
       appBar: const AppBarWidget(
         leading: 'Search',
@@ -73,82 +71,86 @@ class _SearchScreenState extends State<SearchScreen> {
                     ),
                     hintText: 'Search...',
                   ),
-                  onChanged: (value) => runFilter(value),
+                  onChanged: (value) => searchController.searchQuery(value),
                 ),
                 sBoxH10,
-                foundList.isNotEmpty
-                    ? ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Slidable(
-                            startActionPane: ActionPane(
-                              motion: const DrawerMotion(),
-                              extentRatio: 1,
-                              children: [
-                                SlidableAction(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(5.r),
-                                    bottomLeft: Radius.circular(5.r),
+                Consumer<SearchController>(
+                    builder: (BuildContext context, value, Widget? child) {
+                  return value.foundList.isNotEmpty
+                      ? ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Slidable(
+                              startActionPane: ActionPane(
+                                motion: const DrawerMotion(),
+                                extentRatio: 1,
+                                children: [
+                                  SlidableAction(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(5.r),
+                                      bottomLeft: Radius.circular(5.r),
+                                    ),
+                                    onPressed: (context) {
+                                      setState(
+                                        () {
+                                          _showPopUp(value.foundList, index);
+                                        },
+                                      );
+                                    },
+                                    backgroundColor: Colors.red,
+                                    label: 'Delete',
+                                    icon: Icons.delete,
                                   ),
-                                  onPressed: (context) {
-                                    setState(
-                                      () {
-                                        _showPopUp(foundList, index);
-                                      },
-                                    );
-                                  },
-                                  backgroundColor: Colors.red,
-                                  label: 'Delete',
-                                  icon: Icons.delete,
+                                  SlidableAction(
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(5.r),
+                                        bottomRight: Radius.circular(5.r)),
+                                    onPressed: (context) {
+                                      const SnackBar(
+                                        content: Text('loading'),
+                                      );
+                                    },
+                                    backgroundColor: Colors.blueGrey,
+                                    label: 'Edit',
+                                    icon: Icons.edit,
+                                  )
+                                ],
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(0),
+                                leading: Icon(
+                                  value.foundList[index].type ==
+                                          CategoryType.income
+                                      ? Icons.arrow_circle_up
+                                      : Icons.arrow_circle_down,
+                                  color: value.foundList[index].type ==
+                                          CategoryType.income
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
-                                SlidableAction(
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(5.r),
-                                      bottomRight: Radius.circular(5.r)),
-                                  onPressed: (context) {
-                                    const SnackBar(
-                                      content: Text('loading'),
-                                    );
-                                  },
-                                  backgroundColor: Colors.blueGrey,
-                                  label: 'Edit',
-                                  icon: Icons.edit,
-                                )
-                              ],
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(0),
-                              leading: Icon(
-                                foundList[index].type == CategoryType.income
-                                    ? Icons.arrow_circle_up
-                                    : Icons.arrow_circle_down,
-                                color:
-                                    foundList[index].type == CategoryType.income
-                                        ? Colors.green
-                                        : Colors.red,
+                                title: Text(
+                                  value.foundList[index].categoryModal.name,
+                                  style: appBodyTextStyle,
+                                ),
+                                trailing: Text(
+                                  '₹${value.foundList[index].amount}',
+                                  style: homeAmountStyle,
+                                ),
+                                subtitle: Text(
+                                  DateFormat.yMMMMd()
+                                      .format(value.foundList[index].date),
+                                  style: homeDateStyle,
+                                ),
                               ),
-                              title: Text(
-                                foundList[index].categoryModal.name,
-                                style: appBodyTextStyle,
-                              ),
-                              trailing: Text(
-                                '₹${foundList[index].amount}',
-                                style: homeAmountStyle,
-                              ),
-                              subtitle: Text(
-                                DateFormat.yMMMMd()
-                                    .format(foundList[index].date),
-                                style: homeDateStyle,
-                              ),
-                            ),
-                          );
-                        },
-                        itemCount: foundList.length,
-                      )
-                    : const Center(
-                        child: Text('No data found'),
-                      ),
+                            );
+                          },
+                          itemCount: value.foundList.length,
+                        )
+                      : const Center(
+                          child: Text('No data found'),
+                        );
+                })
               ],
             ),
           ),

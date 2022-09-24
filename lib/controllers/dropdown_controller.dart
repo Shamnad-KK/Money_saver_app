@@ -8,9 +8,21 @@ import 'package:money_manager/models/transaction/transaction_model.dart';
 class DropDownController with ChangeNotifier {
   String dropDownValue = 'ALL';
   String customDropDownValue = 'ONE WEEK';
-  String statsDropDownValue = 'ALL';
+  String? _statsDropDownValue = 'ALL';
+  String? get statsDropDownValue => _statsDropDownValue;
 
-  List<TransactionModal> foundData = [];
+  void setStatsDropDown(String? statsDropDownValue) {
+    _statsDropDownValue = statsDropDownValue;
+    notifyListeners();
+  }
+
+  void setFoundData(List<TransactionModal> newFoundData) {
+    _foundData = newFoundData;
+  }
+
+  List<TransactionModal> _foundData = [];
+
+  List<TransactionModal> get foundData => _foundData;
 
   List<TransactionModal> allData =
       TransactionDbFunctions.allTransactionNotifier;
@@ -37,7 +49,7 @@ class DropDownController with ChangeNotifier {
             )
             .toList(),
         onChanged: (String? newValue) async {
-          foundData = allData;
+          setFoundData(allData);
           dropDownValue = newValue!;
           await allFilter(tabController: tabController);
           if (tabController.index == 2) {
@@ -50,7 +62,7 @@ class DropDownController with ChangeNotifier {
   }
 
   Future allFilter({required TabController tabController}) async {
-    foundData = allData;
+    setFoundData(allData);
     List<TransactionModal> results = <TransactionModal>[];
     final todayDate = DateTime.now();
     final date = DateFormat('yMMMMd').format(todayDate);
@@ -82,12 +94,12 @@ class DropDownController with ChangeNotifier {
               element.type == CategoryType.expense)
           .toList();
     }
-    foundData = results;
+    setFoundData(results);
     notifyListeners();
   }
 
   Future customFilter({required TabController tabController}) async {
-    foundData = allData;
+    setFoundData(allData);
     List<TransactionModal> results = <TransactionModal>[];
     final weekDate = DateTime.now().subtract(const Duration(days: 7));
     final monthDate = DateTime.now().subtract(const Duration(days: 28));
@@ -157,47 +169,48 @@ class DropDownController with ChangeNotifier {
               element.date.isAfter(yearDate))
           .toList();
     }
-    foundData = results;
+    setFoundData(results);
     notifyListeners();
   }
 
   statsFilter({required TabController tabController}) {
     List<TransactionModal> results = [];
+    setFoundData(allData);
     final todayDate = DateTime.now();
     final date = DateFormat('yMMMMd').format(todayDate);
     final parsedTodayDate = DateFormat('yMMMMd').parse(date);
     final weekDate = DateTime.now().subtract(const Duration(days: 7));
     final monthDate = DateTime.now().subtract(const Duration(days: 28));
-    if (statsDropDownValue == 'ALL' && tabController.index == 0) {
+    if (_statsDropDownValue == 'ALL' && tabController.index == 0) {
       results = allData;
-    } else if (statsDropDownValue == 'TODAY' && tabController.index == 0) {
+    } else if (_statsDropDownValue == 'TODAY' && tabController.index == 0) {
       results = foundData
           .where((element) => element.date == parsedTodayDate)
           .toList();
-    } else if (statsDropDownValue == '7 DAYS' && tabController.index == 0) {
+    } else if (_statsDropDownValue == '7 DAYS' && tabController.index == 0) {
       results =
           foundData.where((element) => element.date.isAfter(weekDate)).toList();
-    } else if (statsDropDownValue == '30 DAYS' && tabController.index == 0) {
+    } else if (_statsDropDownValue == '30 DAYS' && tabController.index == 0) {
       results = foundData
           .where((element) => element.date.isAfter(monthDate))
           .toList();
-    } else if (statsDropDownValue == 'ALL' && tabController.index == 1) {
+    } else if (_statsDropDownValue == 'ALL' && tabController.index == 1) {
       results = allData
           .where((element) => element.type == CategoryType.income)
           .toList();
-    } else if (statsDropDownValue == 'TODAY' && tabController.index == 1) {
+    } else if (_statsDropDownValue == 'TODAY' && tabController.index == 1) {
       results = foundData
           .where((element) =>
               element.type == CategoryType.income &&
               element.date == parsedTodayDate)
           .toList();
-    } else if (statsDropDownValue == '7 DAYS' && tabController.index == 1) {
+    } else if (_statsDropDownValue == '7 DAYS' && tabController.index == 1) {
       results = foundData
           .where((element) =>
               element.date.isAfter(weekDate) &&
               element.type == CategoryType.income)
           .toList();
-    } else if (statsDropDownValue == '30 DAYS' && tabController.index == 1) {
+    } else if (_statsDropDownValue == '30 DAYS' && tabController.index == 1) {
       results = foundData
           .where((element) =>
               element.type == CategoryType.income &&
@@ -205,30 +218,32 @@ class DropDownController with ChangeNotifier {
           .toList();
     }
     //
-    else if (statsDropDownValue == 'ALL' && tabController.index == 2) {
+    else if (_statsDropDownValue == 'ALL' && tabController.index == 2) {
       results = foundData
           .where((element) => element.type == CategoryType.expense)
           .toList();
-    } else if (statsDropDownValue == 'TODAY' && tabController.index == 2) {
+    } else if (_statsDropDownValue == 'TODAY' && tabController.index == 2) {
       results = foundData
           .where((element) =>
               element.type == CategoryType.expense &&
               element.date == parsedTodayDate)
           .toList();
-    } else if (statsDropDownValue == '7 DAYS' && tabController.index == 2) {
+    } else if (_statsDropDownValue == '7 DAYS' && tabController.index == 2) {
       results = foundData
           .where((element) =>
               element.date.isAfter(weekDate) &&
               element.type == CategoryType.expense)
           .toList();
-    } else if (statsDropDownValue == '30 DAYS' && tabController.index == 2) {
+    } else if (_statsDropDownValue == '30 DAYS' && tabController.index == 2) {
       results = foundData
           .where((element) =>
               element.type == CategoryType.expense &&
               element.date.isAfter(monthDate))
           .toList();
     }
-    foundData = results;
-    notifyListeners();
+
+    _foundData = results;
+
+    return _foundData;
   }
 }

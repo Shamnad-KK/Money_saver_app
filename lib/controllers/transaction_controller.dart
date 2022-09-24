@@ -5,7 +5,6 @@ import 'package:money_manager/models/category/category_type_model/category_type_
 import 'package:money_manager/models/transaction/transaction_model.dart';
 
 class TransactionController with ChangeNotifier {
-  List<TransactionModal> allTransactionList = [];
   DateTime? selectedDate;
   CategoryType _categoryType = CategoryType.income;
   CategoryType get categoryType => _categoryType;

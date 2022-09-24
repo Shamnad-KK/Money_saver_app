@@ -1,6 +1,6 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

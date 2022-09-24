@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
+import 'package:money_manager/controllers/search_controller.dart';
 import 'package:money_manager/models/category/category_model.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider(create: (ctx) => DropDownController()),
               ChangeNotifierProvider(create: (ctx) => TransactionController()),
               ChangeNotifierProvider(create: (ctx) => CategoryDBController()),
+              ChangeNotifierProvider(create: (ctx) => SearchController()),
             ],
             child: MaterialApp(
               builder: (context, Widget? child) {

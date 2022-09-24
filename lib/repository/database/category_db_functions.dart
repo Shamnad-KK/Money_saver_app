@@ -1,5 +1,5 @@
 import 'package:hive_flutter/adapters.dart';
-import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/models/category/category_model.dart';
 
 class CategoryDbFunctions {
