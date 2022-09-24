@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
+import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
@@ -31,6 +32,11 @@ class HomeScreen extends StatelessWidget {
       context,
       listen: false,
     );
+
+    final categoryController = Provider.of<CategoryDBController>(
+      context,
+      listen: false,
+    );
     final dropDownController = Provider.of<DropDownController>(
       context,
       listen: false,
@@ -44,7 +50,7 @@ class HomeScreen extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       transactionController.refreshUi();
-      CategoryDbFunctions().refreshUi();
+      categoryController.refreshUi();
 
       dropDownController.allFilter(tabController: tabController);
       dropDownController.customFilter(tabController: tabController);

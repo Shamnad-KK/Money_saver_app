@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/models/category/category_model.dart';
@@ -7,6 +8,7 @@ import 'package:money_manager/models/category/category_type_model/category_type_
 import 'package:money_manager/widgets/category_exp_tabview_widget.dart';
 import 'package:money_manager/widgets/category_inc_tabview_widget.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
+import 'package:provider/provider.dart';
 
 class AddCategoryScreen extends StatefulWidget {
   const AddCategoryScreen({Key? key}) : super(key: key);
@@ -15,23 +17,25 @@ class AddCategoryScreen extends StatefulWidget {
   State<AddCategoryScreen> createState() => _AddCategoryScreenState();
 }
 
-class _AddCategoryScreenState extends State<AddCategoryScreen>
-    with SingleTickerProviderStateMixin {
+class _AddCategoryScreenState extends State<AddCategoryScreen> {
   TextEditingController categoryController = TextEditingController();
   late TabController tabController;
-  @override
-  void initState() {
-    CategoryDbFunctions().refreshUi();
-    super.initState();
-  }
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
+    final categoryDbController = Provider.of<CategoryDBController>(
+      context,
+      listen: false,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      categoryDbController.refreshUi();
+    });
+
     tabController = TabController(
       length: 2,
-      vsync: this,
+      vsync: Scaffold.of(context),
     );
     return Scaffold(
       appBar: const AppBarWidget(
@@ -112,6 +116,10 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
   }
 
   Future openDialogue() {
+    final categoryDbController = Provider.of<CategoryDBController>(
+      context,
+      listen: false,
+    );
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -128,7 +136,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
             controller: categoryController,
             validator: (value) {
               if (tabController.index == 0) {
-                final income = CategoryDbFunctions.incomeModalNotifier.value
+                final income = categoryDbController.incomeModalNotifier
                     .map((e) => e.name.trim().toLowerCase())
                     .toList();
                 if (income
@@ -137,7 +145,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
                 }
               }
               if (tabController.index == 1) {
-                final expense = CategoryDbFunctions.expenseModalNotifier.value
+                final expense = categoryDbController.expenseModalNotifier
                     .map((e) => e.name.trim().toLowerCase())
                     .toList();
                 if (expense
@@ -177,7 +185,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen>
             ? CategoryType.income
             : CategoryType.expense,
       );
-      await CategoryDbFunctions.instance.addCategory(incomeCategory);
+      await Provider.of<CategoryDBController>(context, listen: false)
+          .addCategory(incomeCategory);
       if (!mounted) {}
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

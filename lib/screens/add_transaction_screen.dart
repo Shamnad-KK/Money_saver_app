@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
+import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/database/functions/category_db_functions.dart';
 import 'package:money_manager/helpers/colors.dart';
@@ -48,8 +49,12 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       context,
       listen: false,
     );
+    final categoryController = Provider.of<CategoryDBController>(
+      context,
+      listen: false,
+    );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      CategoryDbFunctions().refreshUi();
+      categoryController.refreshUi();
       if (widget.type == ScreenAction.editScreen) {
         //dropDownValue = widget.transactionModal?.categoryModal.name;
         transactionController
@@ -127,59 +132,53 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   );
                 }),
                 sBoxH20,
-                Consumer<TransactionController>(
-                  builder:
-                      (BuildContext context, transactionvalue, Widget? child) {
-                    return ValueListenableBuilder(
-                      builder: (BuildContext context, List<CategoryModal> value,
-                          Widget? child) {
-                        return DropdownButtonFormField<String>(
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Category type cannot be empty';
-                            }
-                            return null;
-                          },
-                          decoration: InputDecoration(
-                            hintText: widget.type == ScreenAction.addScreen
-                                ? transactionvalue.categoryType ==
-                                        CategoryType.income
-                                    ? CategoryDbFunctions
-                                            .incomeModalNotifier.value.isEmpty
-                                        ? 'Please add category'
-                                        : 'Choose  category'
-                                    : CategoryDbFunctions
-                                            .expenseModalNotifier.value.isEmpty
-                                        ? 'Please add category'
-                                        : 'Choose  category'
-                                : widget.transactionModal?.type ==
-                                        transactionvalue.categoryType
-                                    ? widget
-                                        .transactionModal!.categoryModal.name
-                                    : 'Choose  category',
-                            hintStyle: appBodyTextStyle,
-                            border: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: blackColor,
-                              ),
-                              borderRadius: BorderRadius.circular(
-                                10.r,
-                              ),
-                            ),
+                Consumer2<TransactionController, CategoryDBController>(
+                  builder: (BuildContext context, transactionvalue,
+                      categoryValue, Widget? child) {
+                    return DropdownButtonFormField<String>(
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Category type cannot be empty';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecoration(
+                        hintText: widget.type == ScreenAction.addScreen
+                            ? transactionvalue.categoryType ==
+                                    CategoryType.income
+                                ? categoryValue.incomeModalNotifier.isEmpty
+                                    ? 'Please add category'
+                                    : 'Choose  category'
+                                : categoryValue.expenseModalNotifier.isEmpty
+                                    ? 'Please add category'
+                                    : 'Choose  category'
+                            : widget.transactionModal?.type ==
+                                    transactionvalue.categoryType
+                                ? widget.transactionModal!.categoryModal.name
+                                : 'Choose  category',
+                        hintStyle: appBodyTextStyle,
+                        border: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: blackColor,
                           ),
-                          icon: const Icon(
-                            Icons.keyboard_arrow_down,
+                          borderRadius: BorderRadius.circular(
+                            10.r,
                           ),
-                          value: transactionvalue.dropDownValue,
-                          onChanged: (newValue) {
-                            transactionController.setDropDownValue(newValue);
-                            // setState(() {
-                            //   dropDownValue = newValue;
-                            // });
-                          },
-                          items: transactionvalue.categoryType ==
-                                  CategoryType.income
-                              ? value
+                        ),
+                      ),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                      ),
+                      value: transactionvalue.dropDownValue,
+                      onChanged: (newValue) {
+                        transactionController.setDropDownValue(newValue);
+                        // setState(() {
+                        //   dropDownValue = newValue;
+                        // });
+                      },
+                      items:
+                          transactionvalue.categoryType == CategoryType.income
+                              ? categoryValue.incomeModalNotifier
                                   .map(
                                     (modal) => DropdownMenuItem<String>(
                                       onTap: () {
@@ -195,7 +194,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     ),
                                   )
                                   .toList()
-                              : value
+                              : categoryValue.expenseModalNotifier
                                   .map(
                                     (modal) => DropdownMenuItem<String>(
                                       onTap: () {
@@ -210,12 +209,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                                     ),
                                   )
                                   .toList(),
-                        );
-                      },
-                      valueListenable:
-                          transactionvalue.categoryType == CategoryType.income
-                              ? CategoryDbFunctions.incomeModalNotifier
-                              : CategoryDbFunctions.expenseModalNotifier,
                     );
                   },
                 ),
@@ -292,6 +285,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       await addTransaction().then((value) async {
                         transactionController.setDropDownValue(null);
                         transactionController.setCategoryModel(null);
+                        transactionController
+                            .setCategoryType(CategoryType.income);
                         transactionController.selectedDate = null;
                         await transactionController.getAllTransactions();
                       });
