@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/constants/constants.dart';
 import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
-import 'package:money_manager/database/functions/category_db_functions.dart';
+import 'package:money_manager/repository/database/category_db_functions.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_model.dart';
