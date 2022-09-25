@@ -5,11 +5,14 @@ import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
 
-class DropDownController with ChangeNotifier {
+class DropDownController extends ChangeNotifier {
   String dropDownValue = 'ALL';
   String customDropDownValue = 'ONE WEEK';
   String? _statsDropDownValue = 'ALL';
   String? get statsDropDownValue => _statsDropDownValue;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   void setStatsDropDown(String? statsDropDownValue) {
     _statsDropDownValue = statsDropDownValue;
@@ -18,6 +21,7 @@ class DropDownController with ChangeNotifier {
 
   void setFoundData(List<TransactionModal> newFoundData) {
     _foundData = newFoundData;
+    notifyListeners();
   }
 
   List<TransactionModal> _foundData = [];
@@ -49,7 +53,7 @@ class DropDownController with ChangeNotifier {
             )
             .toList(),
         onChanged: (String? newValue) async {
-          setFoundData(allData);
+          //setFoundData(allData);
           dropDownValue = newValue!;
           await allFilter(tabController: tabController);
           if (tabController.index == 2) {
@@ -62,6 +66,7 @@ class DropDownController with ChangeNotifier {
   }
 
   Future allFilter({required TabController tabController}) async {
+    _isLoading = true;
     setFoundData(allData);
     List<TransactionModal> results = <TransactionModal>[];
     final todayDate = DateTime.now();
@@ -94,7 +99,9 @@ class DropDownController with ChangeNotifier {
               element.type == CategoryType.expense)
           .toList();
     }
+
     setFoundData(results);
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -169,13 +176,13 @@ class DropDownController with ChangeNotifier {
               element.date.isAfter(yearDate))
           .toList();
     }
-    setFoundData(results);
+    _foundData = results;
     notifyListeners();
   }
 
   statsFilter({required TabController tabController}) {
     List<TransactionModal> results = [];
-    setFoundData(allData);
+
     final todayDate = DateTime.now();
     final date = DateFormat('yMMMMd').format(todayDate);
     final parsedTodayDate = DateFormat('yMMMMd').parse(date);

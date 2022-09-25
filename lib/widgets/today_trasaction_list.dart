@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -20,6 +22,7 @@ class TodayTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("today called");
     return Consumer<DropDownController>(
         builder: (BuildContext context, value, Widget? child) {
       return value.foundData.isEmpty

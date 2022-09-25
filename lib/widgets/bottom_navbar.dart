@@ -18,7 +18,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final List pageList = [
     const HomeScreen(),
     const AddCategoryScreen(),
-    SettingScreen(),
+    const SettingScreen(),
   ];
 
   void onTapped(int newIndex) {

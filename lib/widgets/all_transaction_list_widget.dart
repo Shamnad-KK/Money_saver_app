@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -20,13 +22,17 @@ class AllTransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    log("hy");
     return Consumer<DropDownController>(
       builder: (context, DropDownController value, child) {
+        if (value.isLoading == true) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
         return value.foundData.isEmpty
             ? const Center(
-                child: Center(
-                  child: Text('No Transactions'),
-                ),
+                child: Text('No Transactions'),
               )
             : ListView.builder(
                 shrinkWrap: true,

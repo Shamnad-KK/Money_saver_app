@@ -45,15 +45,16 @@ class HomeScreen extends StatelessWidget {
       vsync: Scaffold.of(context),
     );
 
-    authController.saveName();
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      transactionController.refreshUi();
-      categoryController.refreshUi();
-
-      dropDownController.allFilter(tabController: tabController);
-      dropDownController.customFilter(tabController: tabController);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await authController.saveName();
+      await transactionController.refreshUi();
+      await categoryController.refreshUi();
+      // Future.delayed(const Duration(milliseconds: 500), () {
+      //await dropDownController.initializeList();
+      await dropDownController.allFilter(tabController: tabController);
+      // });
     });
+
     log("build called");
     return Scaffold(
       body: NestedScrollView(
@@ -99,11 +100,12 @@ class HomeScreen extends StatelessWidget {
                 centerTitle: true,
                 expandedTitleScale: 1,
                 title: Consumer<AuthController>(
-                    builder: (BuildContext context, value, Widget? child) {
-                  return Text(
-                    value.name.toUpperCase(),
-                  );
-                }),
+                  builder: (BuildContext context, value, Widget? child) {
+                    return Text(
+                      value.name.toUpperCase(),
+                    );
+                  },
+                ),
                 background: Container(
                   decoration: BoxDecoration(
                     color: mainColor,
@@ -162,8 +164,6 @@ class HomeScreen extends StatelessWidget {
               ),
               TabBar(
                 onTap: (value) {
-                  // dropDownController.foundData = dropDownController.allData;
-
                   tabController.index == 2
                       ? dropDownController.customFilter(
                           tabController: tabController)

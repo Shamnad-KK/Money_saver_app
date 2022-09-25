@@ -29,7 +29,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   void initState() {
     tabController = TabController(length: 3, vsync: this);
     dropDownController = Provider.of(context, listen: false);
-    dropDownController.setFoundData(dropDownController.allData);
+    dropDownController.setFoundData(dropDownController.foundData);
 
     super.initState();
   }
@@ -76,7 +76,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                         .toList(),
                     onChanged: (String? newValue) async {
                       dropDownController
-                          .setFoundData(dropDownController.allData);
+                          .setFoundData(dropDownController.foundData);
                       dropDownController.setStatsDropDown(newValue);
                       await chartSort(
                           value.statsFilter(tabController: tabController));
