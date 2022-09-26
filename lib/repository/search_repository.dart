@@ -1,11 +1,9 @@
 import 'package:money_manager/models/transaction/transaction_model.dart';
-import 'package:money_manager/repository/database/transaction_db_functions.dart';
+import 'package:money_manager/repository/database/transaction_repository.dart';
 
 class SearchRepository {
-  final List<TransactionModal> allData =
-      TransactionDbFunctions.allTransactionNotifier;
-
-  void searchQuery(String query, List<TransactionModal> foundList) {
+  void searchQuery(String query, List<TransactionModal> foundList,
+      List<TransactionModal> allData) {
     List<TransactionModal> results = [];
 
     if (query.isEmpty) {

@@ -23,9 +23,10 @@ class AllTransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log("hy");
-    return Consumer<DropDownController>(
-      builder: (context, DropDownController value, child) {
-        if (value.isLoading == true) {
+    return Consumer2<DropDownController, TransactionController>(
+      builder: (context, DropDownController value,
+          TransactionController transactionController, child) {
+        if (transactionController.isLoading == true) {
           return const Center(
             child: CircularProgressIndicator(),
           );

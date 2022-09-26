@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:money_manager/repository/database/transaction_db_functions.dart';
+import 'package:money_manager/repository/database/transaction_repository.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
@@ -10,9 +10,6 @@ class DropDownController extends ChangeNotifier {
   String customDropDownValue = 'ONE WEEK';
   String? _statsDropDownValue = 'ALL';
   String? get statsDropDownValue => _statsDropDownValue;
-
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
 
   void setStatsDropDown(String? statsDropDownValue) {
     _statsDropDownValue = statsDropDownValue;
@@ -66,7 +63,6 @@ class DropDownController extends ChangeNotifier {
   }
 
   Future allFilter({required TabController tabController}) async {
-    _isLoading = true;
     setFoundData(allData);
     List<TransactionModal> results = <TransactionModal>[];
     final todayDate = DateTime.now();
@@ -101,7 +97,7 @@ class DropDownController extends ChangeNotifier {
     }
 
     setFoundData(results);
-    _isLoading = false;
+
     notifyListeners();
   }
 

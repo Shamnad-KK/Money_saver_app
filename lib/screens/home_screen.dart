@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
-import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
@@ -32,10 +31,6 @@ class HomeScreen extends StatelessWidget {
       listen: false,
     );
 
-    final categoryController = Provider.of<CategoryDBController>(
-      context,
-      listen: false,
-    );
     final dropDownController = Provider.of<DropDownController>(
       context,
       listen: false,
@@ -48,11 +43,8 @@ class HomeScreen extends StatelessWidget {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await authController.saveName();
       await transactionController.refreshUi();
-      await categoryController.refreshUi();
-      // Future.delayed(const Duration(milliseconds: 500), () {
-      //await dropDownController.initializeList();
+
       await dropDownController.allFilter(tabController: tabController);
-      // });
     });
 
     log("build called");
@@ -102,7 +94,7 @@ class HomeScreen extends StatelessWidget {
                 title: Consumer<AuthController>(
                   builder: (BuildContext context, value, Widget? child) {
                     return Text(
-                      value.name.toUpperCase(),
+                      value.name!.toUpperCase(),
                     );
                   },
                 ),

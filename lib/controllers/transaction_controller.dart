@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/repository/database/transaction_db_functions.dart';
+import 'package:money_manager/repository/database/transaction_repository.dart';
 import 'package:money_manager/models/category/category_model.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
@@ -12,6 +12,8 @@ class TransactionController with ChangeNotifier {
   CategoryModal? get categoryModal => _categoryModal;
   String? _dropDownValue;
   String? get dropDownValue => _dropDownValue;
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   double totalIncome = 0;
   double totalExpense = 0;
@@ -44,15 +46,14 @@ class TransactionController with ChangeNotifier {
   }
 
   Future<void> addTransaction(TransactionModal transactionModal) async {
+    _isLoading = true;
     await TransactionDbFunctions().addTransaction(transactionModal);
+    _isLoading = false;
     refreshUi();
   }
 
-  Future<void> getAllTransactions() async {
-    await TransactionDbFunctions().getAllTransactions();
-  }
-
   Future<void> refreshUi() async {
+    _isLoading = true;
     final getAllCatogories = await TransactionDbFunctions().refreshUi();
     totalIncome = 0;
     totalExpense = 0;
@@ -69,6 +70,7 @@ class TransactionController with ChangeNotifier {
       },
     );
     currentBalance = totalIncome - totalExpense;
+    _isLoading = false;
     notifyListeners();
   }
 }

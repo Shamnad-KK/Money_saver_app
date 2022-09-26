@@ -286,7 +286,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         transactionController
                             .setCategoryType(CategoryType.income);
                         transactionController.selectedDate = null;
-                        await transactionController.getAllTransactions();
+                        await transactionController.refreshUi();
                       });
                     }
                   },

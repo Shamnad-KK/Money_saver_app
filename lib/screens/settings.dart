@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
-import 'package:money_manager/repository/database/transaction_db_functions.dart';
+import 'package:money_manager/repository/database/transaction_repository.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/splash_screen.dart';
