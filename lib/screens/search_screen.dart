@@ -21,29 +21,6 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  // List<TransactionModal> transactionModel =
-  //     TransactionDbFunctions.allTransactionNotifier;
-
-  // List<TransactionModal> foundList = [];
-
-  // void runFilter(String enteredKeyword) {
-  //   List<TransactionModal> results = [];
-  //   if (enteredKeyword.isEmpty) {
-  //     results = transactionModel;
-  //   } else {
-  //     results = transactionModel
-  //         .where(
-  //           (element) => element.categoryModal.name.toLowerCase().contains(
-  //                 enteredKeyword.toLowerCase(),
-  //               ),
-  //         )
-  //         .toList();
-  //   }
-  //   setState(() {
-  //     foundList = results;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     final searchController =
@@ -53,9 +30,8 @@ class _SearchScreenState extends State<SearchScreen> {
       listen: false,
     );
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await Future.delayed(const Duration(milliseconds: 500), () async {
-        await transactionController.refreshUi();
-      });
+      await transactionController.refreshUi();
+      searchController.searchQuery('');
     });
     return Scaffold(
       appBar: const AppBarWidget(
@@ -180,7 +156,6 @@ class _SearchScreenState extends State<SearchScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                //   TransactionDbFunctions().deleteTransaction(value[index].id);
                 setState(() {
                   TransactionDbFunctions.allTransactionNotifier.removeAt(index);
                 });

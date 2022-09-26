@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/controllers/dropdown_controller.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_manager/controllers/statistics_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/statistics_sort/stats_sort.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class StatisticsScreen extends StatefulWidget {
   const StatisticsScreen({Key? key}) : super(key: key);
@@ -18,18 +18,20 @@ class StatisticsScreen extends StatefulWidget {
 class _StatisticsScreenState extends State<StatisticsScreen>
     with TickerProviderStateMixin {
   //String dropDownValue = 'ALL';
-  late DropDownController dropDownController;
+  late StatisticsController statisticsController;
   late TabController tabController;
-
-  filter() async {
-    await dropDownController.statsFilter(tabController: tabController);
-  }
 
   @override
   void initState() {
     tabController = TabController(length: 3, vsync: this);
-    dropDownController = Provider.of(context, listen: false);
-    dropDownController.setFoundData(dropDownController.foundData);
+    statisticsController = Provider.of(context, listen: false);
+    // statisticsController.setFoundData(statisticsController.foundData);
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      chartSort(
+        statisticsController.statsFilter(tabController),
+      );
+    });
 
     super.initState();
   }
@@ -50,10 +52,11 @@ class _StatisticsScreenState extends State<StatisticsScreen>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Consumer<DropDownController>(
-                builder: (BuildContext context, value, Widget? child) {
-              return DropdownButtonHideUnderline(
-                child: DropdownButtonFormField<String>(
+            Consumer<StatisticsController>(
+              builder:
+                  (BuildContext context, statisticsConsumer, Widget? child) {
+                return DropdownButtonHideUnderline(
+                  child: DropdownButtonFormField<String>(
                     decoration: InputDecoration(
                       isDense: true,
                       border: OutlineInputBorder(
@@ -65,7 +68,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                         ),
                       ),
                     ),
-                    value: value.statsDropDownValue,
+                    value: statisticsConsumer.statsDropDownValue,
                     items: ['ALL', 'TODAY', '7 DAYS', '30 DAYS']
                         .map(
                           (String value) => DropdownMenuItem<String>(
@@ -75,62 +78,64 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                         )
                         .toList(),
                     onChanged: (String? newValue) async {
-                      dropDownController
-                          .setFoundData(dropDownController.foundData);
-                      dropDownController.setStatsDropDown(newValue);
+                      // statisticsController
+                      //     .setFoundData(statisticsController.foundData);
+                      statisticsController.setStatsDropDown(newValue);
                       await chartSort(
-                          value.statsFilter(tabController: tabController));
-                    }),
-              );
-            }),
+                          statisticsConsumer.statsFilter(tabController));
+                    },
+                  ),
+                );
+              },
+            ),
             sBoxH30,
-            Consumer<DropDownController>(
-                builder: (BuildContext context, value, Widget? child) {
-              return TabBar(
-                onTap: (_) async {
-                  // dropDownController.setFoundData(dropDownController.allData);
-                  await chartSort(dropDownController.statsFilter(
-                      tabController: tabController));
-                },
-                controller: tabController,
-                indicatorColor: Colors.transparent,
-                labelColor: whiteColor,
-                unselectedLabelColor: blackColor,
-                labelStyle: TextStyle(
-                  color: whiteColor,
-                  fontSize: 20.sp,
-                ),
-                unselectedLabelStyle: TextStyle(
-                  color: blackColor,
-                  fontSize: 20.sp,
-                ),
-                indicator: BoxDecoration(
-                  color: mainColor,
-                  borderRadius: BorderRadius.circular(
-                    20.r,
+            Consumer<StatisticsController>(
+              builder:
+                  (BuildContext context, statisticsConsumer, Widget? child) {
+                return TabBar(
+                  onTap: (_) {
+                    chartSort(statisticsConsumer.statsFilter(tabController));
+                  },
+                  controller: tabController,
+                  indicatorColor: Colors.transparent,
+                  labelColor: whiteColor,
+                  unselectedLabelColor: blackColor,
+                  labelStyle: TextStyle(
+                    color: whiteColor,
+                    fontSize: 20.sp,
                   ),
-                ),
-                tabs: const [
-                  Tab(
-                    child: Text(
-                      'All',
+                  unselectedLabelStyle: TextStyle(
+                    color: blackColor,
+                    fontSize: 20.sp,
+                  ),
+                  indicator: BoxDecoration(
+                    color: mainColor,
+                    borderRadius: BorderRadius.circular(
+                      20.r,
                     ),
                   ),
-                  Tab(
-                    child: Text(
-                      'Income',
+                  tabs: const [
+                    Tab(
+                      child: Text(
+                        'All',
+                      ),
                     ),
-                  ),
-                  Tab(
-                    child: Text(
-                      'Expense',
+                    Tab(
+                      child: Text(
+                        'Income',
+                      ),
                     ),
-                  ),
-                ],
-              );
-            }),
-            Consumer<DropDownController>(
-                builder: (BuildContext context, value, Widget? child) {
+                    Tab(
+                      child: Text(
+                        'Expense',
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+            Consumer<StatisticsController>(builder:
+                (BuildContext context, statisticsConsumer, Widget? child) {
               return Expanded(
                 flex: 2,
                 child: TabBarView(
@@ -138,7 +143,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                   controller: tabController,
                   children: [
                     //overview
-                    dropDownController.foundData.isNotEmpty
+                    statisticsConsumer.foundData.isNotEmpty
                         ? SfCircularChart(
                             legend: Legend(
                               isResponsive: true,
@@ -151,8 +156,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                 dataLabelSettings: const DataLabelSettings(
                                   isVisible: true,
                                 ),
-                                dataSource: chartSort(value.statsFilter(
-                                    tabController: tabController)),
+                                dataSource:
+                                    chartSort(statisticsConsumer.foundData),
                                 xValueMapper: (ChartData transaction, _) =>
                                     transaction.name,
                                 yValueMapper: (ChartData transaction, _) =>
@@ -167,7 +172,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                           ),
 
                     //income
-                    dropDownController.foundData.isNotEmpty
+                    statisticsConsumer.foundData.isNotEmpty
                         ? SfCircularChart(
                             legend: Legend(
                               isResponsive: true,
@@ -177,9 +182,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                               PieSeries<ChartData, String>(
                                   explode: true,
                                   explodeGesture: ActivationMode.longPress,
-                                  dataSource: chartSort(
-                                      dropDownController.statsFilter(
-                                          tabController: tabController)),
+                                  dataSource:
+                                      chartSort(statisticsConsumer.foundData),
                                   dataLabelSettings: const DataLabelSettings(
                                     isVisible: true,
                                   ),
@@ -196,7 +200,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                           ),
 
                     //expense
-                    dropDownController.foundData.isNotEmpty
+                    statisticsConsumer.foundData.isNotEmpty
                         ? SfCircularChart(
                             legend: Legend(
                               isResponsive: true,
@@ -209,9 +213,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
                                   dataLabelSettings: const DataLabelSettings(
                                     isVisible: true,
                                   ),
-                                  dataSource: chartSort(
-                                      dropDownController.statsFilter(
-                                          tabController: tabController)),
+                                  dataSource:
+                                      chartSort(statisticsConsumer.foundData),
                                   xValueMapper: (ChartData transaction, _) =>
                                       transaction.name,
                                   yValueMapper: (ChartData transaction, _) =>

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/controllers/category_controller.dart';
@@ -30,12 +31,6 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  // String? amountType;
-  //String? dropDownValue;
-  //CategoryType? categoryType;
-  //CategoryModal? categoryModal;
-
-  //final DateTime currentDate = DateTime.now();
   final formKey = GlobalKey<FormState>();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
@@ -43,14 +38,14 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   @override
   Widget build(BuildContext context) {
     log("add screen called");
-    final transactionController = Provider.of<TransactionController>(
-      context,
-      listen: false,
-    );
-    final categoryController = Provider.of<CategoryDBController>(
-      context,
-      listen: false,
-    );
+
+    final transactionController =
+        Provider.of<TransactionController>(context, listen: false);
+    final categoryController =
+        Provider.of<CategoryDBController>(context, listen: false);
+    final dropDownController =
+        Provider.of<DropDownController>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       categoryController.refreshUi();
       if (widget.type == ScreenAction.editScreen) {
@@ -281,6 +276,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ontap: () async {
                     if (formKey.currentState!.validate()) {
                       await addTransaction().then((value) async {
+                        dropDownController.dropDownValue = 'ALL';
+                        dropDownController.customDropDownValue = 'ONE WEEK';
                         transactionController.setDropDownValue(null);
                         transactionController.setCategoryModel(null);
                         transactionController

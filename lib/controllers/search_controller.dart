@@ -6,11 +6,11 @@ import 'package:money_manager/repository/search_repository.dart';
 class SearchController extends ChangeNotifier {
   final List<TransactionModal> allData =
       TransactionDbFunctions.allTransactionNotifier;
-  final List<TransactionModal> _foundList = [];
+  List<TransactionModal> _foundList = [];
   List<TransactionModal> get foundList => _foundList;
 
-  void searchQuery(String query) {
-    SearchRepository().searchQuery(query, _foundList, allData);
+  void searchQuery(String query) async {
+    _foundList = SearchRepository().searchQuery(query, _foundList, allData);
     notifyListeners();
   }
 }
