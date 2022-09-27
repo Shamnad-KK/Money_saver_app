@@ -15,6 +15,8 @@ class TransactionModal extends HiveObject {
   CategoryType type;
   @HiveField(4)
   num amount;
+  @HiveField(5)
+  String? description;
 
   TransactionModal({
     required this.amount,
@@ -22,6 +24,7 @@ class TransactionModal extends HiveObject {
     required this.categoryModal,
     required this.date,
     required this.type,
+    this.description,
   });
 
   editTransaction(TransactionModal newTransaction) {
@@ -30,6 +33,7 @@ class TransactionModal extends HiveObject {
     categoryModal = newTransaction.categoryModal;
     date = newTransaction.date;
     type = newTransaction.type;
+    description = newTransaction.description;
     save();
   }
 

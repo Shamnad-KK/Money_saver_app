@@ -24,14 +24,6 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryDbController = Provider.of<CategoryDBController>(
-      context,
-      listen: false,
-    );
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      categoryDbController.refreshUi();
-    });
-
     tabController = TabController(
       length: 2,
       vsync: Scaffold.of(context),

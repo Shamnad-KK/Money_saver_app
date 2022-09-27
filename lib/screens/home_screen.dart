@@ -2,12 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
-import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
+import 'package:money_manager/helpers/constants.dart';
+import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/screens/add_transaction_screen.dart';
 import 'package:money_manager/screens/search_screen.dart';
@@ -26,10 +25,6 @@ class HomeScreen extends StatelessWidget {
       context,
       listen: false,
     );
-    final transactionController = Provider.of<TransactionController>(
-      context,
-      listen: false,
-    );
 
     final dropDownController = Provider.of<DropDownController>(
       context,
@@ -42,7 +37,6 @@ class HomeScreen extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await authController.saveName();
-      await transactionController.refreshUi();
 
       await dropDownController.allFilter(tabController: tabController);
     });

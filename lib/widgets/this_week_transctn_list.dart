@@ -58,97 +58,104 @@ class CustomTransactionList extends StatelessWidget {
             await dropDownController.customFilter(tabController: tabController);
           },
         ),
-        dropDownController.foundData.isEmpty
-            ? const Expanded(
-                child: Center(
-                  child: Text('No Transactions'),
+        context.watch<TransactionController>().isLoading == true
+            ? const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
                 ),
               )
-            : Expanded(
-                child: Consumer<DropDownController>(
-                  builder: (BuildContext context, value, Widget? child) {
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Slidable(
-                          startActionPane: ActionPane(
-                            motion: const DrawerMotion(),
-                            extentRatio: 1,
-                            children: [
-                              SlidableAction(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5.r),
-                                  bottomLeft: Radius.circular(5.r),
-                                ),
-                                onPressed: (context) {
-                                  _showPopUp(
-                                      value, value.foundData, index, context);
-                                },
-                                backgroundColor: Colors.red,
-                                label: 'Delete',
-                                icon: Icons.delete,
-                              ),
-                              SlidableAction(
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(5.r),
-                                  bottomRight: Radius.circular(5.r),
-                                ),
-                                onPressed: (context) {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (ctx) => AddTransactionScreen(
-                                        type: ScreenAction.editScreen,
-                                        transactionModal:
-                                            value.foundData[index],
-                                      ),
+            : dropDownController.foundData.isEmpty
+                ? const Expanded(
+                    child: Center(
+                      child: Text('No Transactions'),
+                    ),
+                  )
+                : Expanded(
+                    child: Consumer<DropDownController>(
+                      builder: (BuildContext context, value, Widget? child) {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Slidable(
+                              startActionPane: ActionPane(
+                                motion: const DrawerMotion(),
+                                extentRatio: 1,
+                                children: [
+                                  SlidableAction(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(5.r),
+                                      bottomLeft: Radius.circular(5.r),
                                     ),
-                                  );
-                                },
-                                backgroundColor: Colors.blueGrey,
-                                label: 'Edit',
-                                icon: Icons.edit,
-                              )
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(0),
-                            leading: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  value.foundData[index].type ==
-                                          CategoryType.income
-                                      ? Icons.arrow_circle_up
-                                      : Icons.arrow_circle_down,
-                                  color: value.foundData[index].type ==
-                                          CategoryType.income
-                                      ? Colors.green
-                                      : Colors.red,
+                                    onPressed: (context) {
+                                      _showPopUp(value, value.foundData, index,
+                                          context);
+                                    },
+                                    backgroundColor: Colors.red,
+                                    label: 'Delete',
+                                    icon: Icons.delete,
+                                  ),
+                                  SlidableAction(
+                                    borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(5.r),
+                                      bottomRight: Radius.circular(5.r),
+                                    ),
+                                    onPressed: (context) {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (ctx) =>
+                                              AddTransactionScreen(
+                                            type: ScreenAction.editScreen,
+                                            transactionModal:
+                                                value.foundData[index],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    backgroundColor: Colors.blueGrey,
+                                    label: 'Edit',
+                                    icon: Icons.edit,
+                                  )
+                                ],
+                              ),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.all(0),
+                                leading: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      value.foundData[index].type ==
+                                              CategoryType.income
+                                          ? Icons.arrow_circle_up
+                                          : Icons.arrow_circle_down,
+                                      color: value.foundData[index].type ==
+                                              CategoryType.income
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            title: Text(
-                              value.foundData[index].categoryModal.name,
-                              style: appBodyTextStyle,
-                            ),
-                            trailing: Text(
-                              "₹ ${value.foundData[index].amount.round()}",
-                              style: homeAmountStyle,
-                            ),
-                            subtitle: Text(
-                              DateFormat.yMMMMd()
-                                  .format(value.foundData[index].date),
-                              style: homeDateStyle,
-                            ),
-                          ),
+                                title: Text(
+                                  value.foundData[index].categoryModal.name,
+                                  style: appBodyTextStyle,
+                                ),
+                                trailing: Text(
+                                  "₹ ${value.foundData[index].amount.round()}",
+                                  style: homeAmountStyle,
+                                ),
+                                subtitle: Text(
+                                  DateFormat.yMMMMd()
+                                      .format(value.foundData[index].date),
+                                  style: homeDateStyle,
+                                ),
+                              ),
+                            );
+                          },
+                          itemCount: value.foundData.length,
                         );
                       },
-                      itemCount: value.foundData.length,
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
       ],
     );
   }

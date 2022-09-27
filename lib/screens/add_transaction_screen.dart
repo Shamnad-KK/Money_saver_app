@@ -34,6 +34,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
+  final TextEditingController? desController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         //categoryModal = widget.transactionModal?.categoryModal;
         transactionController.setCategoryType(widget.transactionModal!.type);
         amountController.text = widget.transactionModal!.amount.toString();
+        desController?.text =
+            widget.transactionModal?.description ?? "No description";
         dateController.text =
             DateFormat('yMMMMd').format(widget.transactionModal!.date);
       }
@@ -207,6 +210,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                 ),
                 sBoxH20,
                 TextFormField(
+                  controller: desController,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    hintText: 'Description (optional)',
+                    hintStyle: appBodyTextStyle,
+                    border: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: blackColor,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        10.r,
+                      ),
+                    ),
+                  ),
+                ),
+                sBoxH20,
+                TextFormField(
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(
                       RegExp(r'^\d+(?:-\d+)?$'),
@@ -313,6 +333,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       transactionController.selectedDate ??= widget.transactionModal?.date;
       final transactionModal = TransactionModal(
         amount: parsedAmount!,
+        description:
+            desController?.text == '' ? "No description" : desController!.text,
         id: DateTime.now().microsecondsSinceEpoch.toString(),
         categoryModal: transactionController.categoryModal!,
         date: transactionController.selectedDate!,

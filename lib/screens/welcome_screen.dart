@@ -1,34 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/models/welcome_screen/welcome_screen_model.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/helpers/colors.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/text_style.dart';
+import 'package:money_manager/helpers/welcome_screen_dummylist.dart';
 import 'package:money_manager/screens/credentials_screen.dart';
 import 'package:money_manager/widgets/small_button.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  WelcomeScreen({Key? key}) : super(key: key);
-
-  final List<WelcomeModel> welcomeModel = [
-    WelcomeModel(
-      firstLetter: 'E',
-      text: 'very time you\nborrow money,\nyou\'re robbing\nyour future self.',
-      image: 'assets/welcome_screen/2.gif',
-      author: '- Nathan W. Morris',
-    ),
-    WelcomeModel(
-      firstLetter: 'B',
-      text: 'alancing\nyour money is\nthe key to having\nenough.',
-      image: 'assets/welcome_screen/5.gif',
-      author: '- Elizabeth Warren',
-    ),
-    WelcomeModel(
-      firstLetter: 'M',
-      text: 'anage your\nbudget like a pro',
-      image: 'assets/welcome_screen/1.gif',
-    ),
-  ];
+  const WelcomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +101,8 @@ class WelcomeScreen extends StatelessWidget {
                                 ontap: () {
                                   Navigator.of(context).pushReplacement(
                                     MaterialPageRoute(
-                                      builder: (context) => CredentialScreen(),
+                                      builder: (context) =>
+                                          const CredentialScreen(),
                                     ),
                                   );
                                 },

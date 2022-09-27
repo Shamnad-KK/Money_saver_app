@@ -6,15 +6,14 @@ import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/widgets/bottom_navbar.dart';
 import 'package:money_manager/widgets/small_button.dart';
+import 'package:provider/provider.dart';
 
 class CredentialScreen extends StatelessWidget {
-  CredentialScreen({Key? key}) : super(key: key);
-
-  final TextEditingController nameController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+  const CredentialScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final authController = Provider.of<AuthController>(context, listen: false);
     return Container(
       height: double.infinity,
       width: double.infinity,
@@ -45,10 +44,10 @@ class CredentialScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Form(
-                    key: _formKey,
+                    key: authController.formKey,
                     autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: TextFormField(
-                      controller: nameController,
+                      controller: authController.nameController,
                       validator: (name) {
                         if (name!.isEmpty) {
                           return 'Name cannot be empty';
@@ -86,10 +85,11 @@ class CredentialScreen extends StatelessWidget {
                     alignment: Alignment.centerRight,
                     child: SmallButton(
                       ontap: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState?.save();
+                        if (authController.formKey.currentState!.validate()) {
+                          authController.formKey.currentState?.save();
 
-                          AuthController.login(name: nameController.text);
+                          authController.login(
+                              name: authController.nameController.text);
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => const BottomNavBar(),

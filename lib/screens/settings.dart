@@ -10,6 +10,7 @@ import 'package:money_manager/screens/splash_screen.dart';
 import 'package:money_manager/screens/statistics_screen.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:money_manager/widgets/settings_row_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -296,6 +297,7 @@ class SettingScreen extends StatelessWidget {
   }
 
   void _showPopUp(BuildContext context) {
+    final authController = Provider.of<AuthController>(context, listen: false);
     showDialog(
       context: context,
       builder: (context) {
@@ -305,7 +307,7 @@ class SettingScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                AuthController.resetApp();
+                authController.resetApp();
                 TransactionDbFunctions().deleteAllData();
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:money_manager/repository/auth_repository.dart';
 
 class AuthController extends ChangeNotifier {
+  final TextEditingController _nameController = TextEditingController();
+  TextEditingController get nameController => _nameController;
+  final _formKey = GlobalKey<FormState>();
+  GlobalKey<FormState> get formKey => _formKey;
   String? name = '';
 
-  static Future login({required String name}) async {
+  Future login({required String name}) async {
     await AuthRepository.login(name: name);
   }
 
@@ -17,7 +21,8 @@ class AuthController extends ChangeNotifier {
     await AuthRepository.checkSaved(context);
   }
 
-  static Future resetApp() async {
+  Future resetApp() async {
+    _nameController.clear();
     await AuthRepository.resetApp();
   }
 }

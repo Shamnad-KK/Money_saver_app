@@ -13,4 +13,9 @@ class SearchController extends ChangeNotifier {
     _foundList = SearchRepository().searchQuery(query, _foundList, allData);
     notifyListeners();
   }
+
+  void deleteFromSearch(TransactionModal modal) async {
+    await modal.deleteTransaction(modal);
+    notifyListeners();
+  }
 }

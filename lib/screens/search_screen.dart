@@ -4,33 +4,26 @@ import 'package:intl/intl.dart';
 import 'package:money_manager/controllers/search_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/repository/database/transaction_repository.dart';
+import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
+import 'package:money_manager/screens/add_transaction_screen.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
-class SearchScreen extends StatefulWidget {
+class SearchScreen extends StatelessWidget {
   const SearchScreen({Key? key}) : super(key: key);
 
-  @override
-  State<SearchScreen> createState() => _SearchScreenState();
-}
-
-class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final searchController =
         Provider.of<SearchController>(context, listen: false);
-    final transactionController = Provider.of<TransactionController>(
-      context,
-      listen: false,
-    );
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await transactionController.refreshUi();
+      // await transactionController.refreshUi();
       searchController.searchQuery('');
     });
     return Scaffold(
@@ -78,11 +71,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                         bottomLeft: Radius.circular(5.r),
                                       ),
                                       onPressed: (context) {
-                                        setState(
-                                          () {
-                                            _showPopUp(value.foundList, index);
-                                          },
-                                        );
+                                        _showPopUp(context, value,
+                                            value.foundList, index);
                                       },
                                       backgroundColor: Colors.red,
                                       label: 'Delete',
@@ -93,8 +83,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                           topRight: Radius.circular(5.r),
                                           bottomRight: Radius.circular(5.r)),
                                       onPressed: (context) {
-                                        const SnackBar(
-                                          content: Text('loading'),
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (ctx) =>
+                                                AddTransactionScreen(
+                                              type: ScreenAction.editScreen,
+                                              transactionModal:
+                                                  value.foundList[index],
+                                            ),
+                                          ),
                                         );
                                       },
                                       backgroundColor: Colors.blueGrey,
@@ -146,7 +143,12 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  void _showPopUp(List<TransactionModal> value, int index) {
+  void _showPopUp(BuildContext context, SearchController searchController,
+      List<TransactionModal> modal, int index) {
+    final transactionController = Provider.of<TransactionController>(
+      context,
+      listen: false,
+    );
     showDialog(
       context: context,
       builder: (BuildContext ctx) {
@@ -155,19 +157,27 @@ class _SearchScreenState extends State<SearchScreen> {
           content: const Text('Do you want to delete ?'),
           actions: [
             TextButton(
-              onPressed: () {
-                setState(() {
-                  TransactionDbFunctions.allTransactionNotifier.removeAt(index);
-                });
+              onPressed: () async {
+                final navContext = Navigator.of(context);
+                final scaffoldContext = ScaffoldMessenger.of(context);
 
-                ScaffoldMessenger.of(context).showSnackBar(
+                searchController.deleteFromSearch(modal[index]);
+                searchController.searchQuery('');
+                transactionController.refreshUi();
+
+                // navContext.pushAndRemoveUntil(
+                //     MaterialPageRoute(
+                //         builder: (context) => const BottomAppBar()),
+                //     (route) => false);
+
+                scaffoldContext.showSnackBar(
                   const SnackBar(
                     duration: Duration(seconds: 1),
                     content: Text('Transaction deleted'),
                     backgroundColor: Colors.green,
                   ),
                 );
-                Navigator.of(context).pop();
+                navContext.pop();
               },
               child: const Text('Yes'),
             ),

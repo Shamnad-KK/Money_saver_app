@@ -23,8 +23,16 @@ class TodayTransactionList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     log("today called");
-    return Consumer<DropDownController>(
-        builder: (BuildContext context, value, Widget? child) {
+    return Consumer2<DropDownController, TransactionController>(builder:
+        (BuildContext context, value,
+            TransactionController transactionController, Widget? child) {
+      if (transactionController.isLoading == true) {
+        return const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        );
+      }
       return value.foundData.isEmpty
           ? const Center(
               child: Center(

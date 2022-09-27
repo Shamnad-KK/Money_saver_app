@@ -22,13 +22,14 @@ class TransactionModalAdapter extends TypeAdapter<TransactionModal> {
       categoryModal: fields[1] as CategoryModal,
       date: fields[2] as DateTime,
       type: fields[3] as CategoryType,
+      description: fields[5] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, TransactionModal obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,7 +39,9 @@ class TransactionModalAdapter extends TypeAdapter<TransactionModal> {
       ..writeByte(3)
       ..write(obj.type)
       ..writeByte(4)
-      ..write(obj.amount);
+      ..write(obj.amount)
+      ..writeByte(5)
+      ..write(obj.description);
   }
 
   @override

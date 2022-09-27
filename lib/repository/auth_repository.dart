@@ -28,7 +28,7 @@ class AuthRepository {
     if (name == null) {
       newContext.pushReplacement(
         MaterialPageRoute(
-          builder: (context) => WelcomeScreen(),
+          builder: (context) => const WelcomeScreen(),
         ),
       );
     } else {
