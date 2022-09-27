@@ -31,13 +31,12 @@ class AddTransactionScreen extends StatefulWidget {
 }
 
 class _AddTransactionScreenState extends State<AddTransactionScreen> {
-  final formKey = GlobalKey<FormState>();
-  final TextEditingController amountController = TextEditingController();
-  final TextEditingController dateController = TextEditingController();
-  final TextEditingController? desController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final TextEditingController amountController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    TextEditingController? desController = TextEditingController();
     log("add screen called");
 
     final transactionController =
@@ -56,7 +55,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
         //categoryModal = widget.transactionModal?.categoryModal;
         transactionController.setCategoryType(widget.transactionModal!.type);
         amountController.text = widget.transactionModal!.amount.toString();
-        desController?.text =
+        desController.text =
             widget.transactionModal?.description ?? "No description";
         dateController.text =
             DateFormat('yMMMMd').format(widget.transactionModal!.date);
@@ -295,7 +294,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   text: 'Save',
                   ontap: () async {
                     if (formKey.currentState!.validate()) {
-                      await addTransaction().then((value) async {
+                      await addTransaction(
+                        amountController,
+                        dateController,
+                        desController,
+                      ).then((value) async {
                         dropDownController.dropDownValue = 'ALL';
                         dropDownController.customDropDownValue = 'ONE WEEK';
                         transactionController.setDropDownValue(null);
@@ -317,7 +320,11 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     );
   }
 
-  Future<void> addTransaction() async {
+  Future<void> addTransaction(
+    TextEditingController amountController,
+    TextEditingController dateController,
+    TextEditingController? desController,
+  ) async {
     final transactionController = Provider.of<TransactionController>(
       context,
       listen: false,

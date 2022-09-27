@@ -3,11 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
-import 'package:money_manager/widgets/home_amount_type.dart';
+import 'package:money_manager/view/home_screen/widgets/home_amount_type_widget.dart';
 import 'package:provider/provider.dart';
 
-class HomeCardWidget extends StatelessWidget {
-  const HomeCardWidget({
+class AmountCardWidget extends StatelessWidget {
+  const AmountCardWidget({
     Key? key,
   }) : super(key: key);
 
