@@ -1,5 +1,5 @@
 class AppUrls {
-  static final Uri mailurl = Uri.parse('mailto:shamnadchemmu702@gmail.com');
+  static final Uri mailurl = Uri.parse('mailto:shamnad.dev@gmail.com');
   static final Uri fbUrl =
       Uri.parse('https://www.facebook.com/profile.php?id=100005084624697');
 
