@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/controllers/search_controller.dart';
-import 'package:money_manager/controllers/transaction_controller.dart';
+import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/enums.dart';
-import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
-import 'package:money_manager/models/transaction/transaction_model.dart';
 import 'package:money_manager/view/add_transaction_screen/add_transaction_screen.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class SearchScreen extends StatelessWidget {
@@ -21,11 +19,10 @@ class SearchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final searchController =
         Provider.of<SearchController>(context, listen: false);
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      // await transactionController.refreshUi();
-      searchController.searchQuery('');
+      context.read<SearchController>().searchQuery('');
     });
+
     return Scaffold(
       appBar: const AppBarWidget(
         leading: 'Search',
@@ -41,6 +38,7 @@ class SearchScreen extends StatelessWidget {
             child: Column(
               children: [
                 TextFormField(
+                  controller: searchController.searchTextController,
                   decoration: InputDecoration(
                     isDense: true,
                     fillColor: whiteColor,
@@ -50,16 +48,19 @@ class SearchScreen extends StatelessWidget {
                     ),
                     hintText: 'Search...',
                   ),
-                  onChanged: (value) => searchController.searchQuery(value),
+                  onChanged: (_) => context
+                      .read<SearchController>()
+                      .searchQuery(searchController.searchTextController.text),
                 ),
                 sBoxH10,
                 Consumer<SearchController>(
-                  builder: (BuildContext context, value, Widget? child) {
+                  builder: (BuildContext context, SearchController value,
+                      Widget? child) {
                     return value.foundList.isNotEmpty
                         ? ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, index) {
+                            itemBuilder: (ctx, index) {
                               return Slidable(
                                 startActionPane: ActionPane(
                                   motion: const DrawerMotion(),
@@ -70,9 +71,9 @@ class SearchScreen extends StatelessWidget {
                                         topLeft: Radius.circular(5.r),
                                         bottomLeft: Radius.circular(5.r),
                                       ),
-                                      onPressed: (context) {
-                                        _showPopUp(context, value,
-                                            value.foundList, index);
+                                      onPressed: (_) async {
+                                        await value.deleteFromSearch(
+                                            value.foundList[index], ctx);
                                       },
                                       backgroundColor: Colors.red,
                                       label: 'Delete',
@@ -140,56 +141,6 @@ class SearchScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  void _showPopUp(BuildContext context, SearchController searchController,
-      List<TransactionModal> modal, int index) {
-    final transactionController = Provider.of<TransactionController>(
-      context,
-      listen: false,
-    );
-    showDialog(
-      context: context,
-      builder: (BuildContext ctx) {
-        return AlertDialog(
-          title: const Text('Are you sure ?'),
-          content: const Text('Do you want to delete ?'),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final navContext = Navigator.of(context);
-                final scaffoldContext = ScaffoldMessenger.of(context);
-
-                searchController.deleteFromSearch(modal[index]);
-                searchController.searchQuery('');
-                transactionController.refreshUi();
-
-                // navContext.pushAndRemoveUntil(
-                //     MaterialPageRoute(
-                //         builder: (context) => const BottomAppBar()),
-                //     (route) => false);
-
-                scaffoldContext.showSnackBar(
-                  const SnackBar(
-                    duration: Duration(seconds: 1),
-                    content: Text('Transaction deleted'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-                navContext.pop();
-              },
-              child: const Text('Yes'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('No'),
-            ),
-          ],
-        );
-      },
     );
   }
 }

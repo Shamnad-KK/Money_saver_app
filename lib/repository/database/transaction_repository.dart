@@ -3,11 +3,11 @@ import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/models/category/category_model.dart';
 import 'package:money_manager/models/transaction/transaction_model.dart';
 
-class TransactionDbFunctions {
-  TransactionDbFunctions._instance();
-  static TransactionDbFunctions instance = TransactionDbFunctions._instance();
+class TransactionRepository {
+  TransactionRepository._instance();
+  static TransactionRepository instance = TransactionRepository._instance();
 
-  factory TransactionDbFunctions() {
+  factory TransactionRepository() {
     return instance;
   }
 

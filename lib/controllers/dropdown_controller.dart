@@ -16,8 +16,7 @@ class DropDownController extends ChangeNotifier {
 
   List<TransactionModal> get foundData => _foundData;
 
-  List<TransactionModal> allData =
-      TransactionDbFunctions.allTransactionNotifier;
+  List<TransactionModal> allData = TransactionRepository.allTransactionNotifier;
 
   Widget homeDrop(TabController tabController) {
     return DropdownButtonHideUnderline(

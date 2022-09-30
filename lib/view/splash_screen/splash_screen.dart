@@ -1,9 +1,9 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/controllers/auth_controller.dart';
-import 'package:money_manager/helpers/colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:money_manager/controllers/splash_controller.dart';
+import 'package:money_manager/helpers/colors.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/text_style.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -11,8 +11,9 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      gotoLogin(context);
+    final splashController = SplashController();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await splashController.gotoLogin(context);
     });
     return Scaffold(
       backgroundColor: mainColor,
@@ -42,13 +43,5 @@ class SplashScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> gotoLogin(BuildContext context) async {
-    final checkSaved = AuthController.checkSaved(context);
-    await Future.delayed(
-      const Duration(seconds: 2),
-    );
-    await checkSaved;
   }
 }

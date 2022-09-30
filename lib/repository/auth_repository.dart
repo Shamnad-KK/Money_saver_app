@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/screens/welcome_screen.dart';
+import 'package:money_manager/view/welcome_screen/welcome_screen.dart';
 import 'package:money_manager/widgets/bottom_navbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

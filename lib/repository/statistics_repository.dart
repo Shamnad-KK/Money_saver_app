@@ -10,7 +10,6 @@ class StatisticsRepository {
     String? statsDropDownValue,
     TabController tabController,
   ) {
-    foundData = allData;
     List<TransactionModal> results = [];
 
     final todayDate = DateTime.now();

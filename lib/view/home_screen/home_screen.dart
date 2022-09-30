@@ -21,6 +21,7 @@ class HomeScreen extends StatelessWidget {
       context,
       listen: false,
     );
+
     TabController tabController = TabController(
       length: 3,
       vsync: Scaffold.of(context),

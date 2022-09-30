@@ -37,8 +37,8 @@ class TransactionModal extends HiveObject {
     save();
   }
 
-  deleteTransaction(TransactionModal newTransaction) {
-    newTransaction.delete();
+  deleteTransaction(TransactionModal newTransaction) async {
+    await newTransaction.delete();
     //delete();
   }
 }

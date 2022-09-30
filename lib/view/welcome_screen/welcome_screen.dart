@@ -4,7 +4,7 @@ import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/helpers/welcome_screen_dummylist.dart';
-import 'package:money_manager/screens/credentials_screen.dart';
+import 'package:money_manager/view/credential_screen/credentials_screen.dart';
 import 'package:money_manager/widgets/small_button.dart';
 
 class WelcomeScreen extends StatelessWidget {

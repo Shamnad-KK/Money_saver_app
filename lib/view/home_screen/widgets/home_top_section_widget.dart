@@ -3,7 +3,7 @@ import 'package:money_manager/controllers/auth_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/view/add_transaction_screen/add_transaction_screen.dart';
-import 'package:money_manager/screens/search_screen.dart';
+import 'package:money_manager/view/search_screen/search_screen.dart';
 import 'package:money_manager/view/home_screen/widgets/amount_card_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

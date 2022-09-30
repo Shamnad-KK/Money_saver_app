@@ -4,9 +4,9 @@ import 'package:money_manager/controllers/bottom_nav_controller.dart';
 import 'package:money_manager/controllers/category_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
 import 'package:money_manager/helpers/colors.dart';
-import 'package:money_manager/screens/add_category_screen.dart';
+import 'package:money_manager/view/add_category_screen/add_category_screen.dart';
 import 'package:money_manager/view/home_screen/home_screen.dart';
-import 'package:money_manager/screens/settings.dart';
+import 'package:money_manager/view/settings_screen/settings_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
