@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:money_manager/controllers/statistics_controller.dart';
-import 'package:money_manager/helpers/colors.dart';
 import 'package:money_manager/helpers/constants.dart';
-import 'package:money_manager/models/statistics/chart_model.dart';
 import 'package:money_manager/view/statistics_screen/widgets/statistics_view_widget.dart';
 import 'package:money_manager/view/statistics_screen/widgets/stats_dropdown_widget.dart';
 import 'package:money_manager/view/statistics_screen/widgets/stats_tabbar_widget.dart';
 import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({Key? key}) : super(key: key);
