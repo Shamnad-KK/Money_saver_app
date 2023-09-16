@@ -46,6 +46,7 @@ class AddIncomeCategoryTabbarView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       value.incomeModalNotifier[index].name,

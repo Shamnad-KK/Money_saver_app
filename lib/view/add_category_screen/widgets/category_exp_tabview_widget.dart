@@ -38,6 +38,7 @@ class AddExpenseCategoryTabbarView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       value.expenseModalNotifier[index].name,

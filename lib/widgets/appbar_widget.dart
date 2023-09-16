@@ -6,9 +6,15 @@ import 'package:money_manager/models/category/category_type_model/category_type_
 import 'package:provider/provider.dart';
 
 class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
-  const AppBarWidget({Key? key, this.leading, this.actions}) : super(key: key);
+  const AppBarWidget({
+    Key? key,
+    this.leading,
+    this.actions,
+    this.automaticallyImplyLeading = true,
+  }) : super(key: key);
   final String? leading;
   final List<Widget>? actions;
+  final bool automaticallyImplyLeading;
   @override
   Widget build(BuildContext context) {
     final transactionController = Provider.of<TransactionController>(
@@ -16,19 +22,22 @@ class AppBarWidget extends StatelessWidget implements PreferredSizeWidget {
       listen: false,
     );
     return AppBar(
-      leading: IconButton(
-        onPressed: () {
-          Navigator.of(context).pop();
-          transactionController.setDropDownValue(null);
-          transactionController.setCategoryModel(null);
-          transactionController.setCategoryType(CategoryType.income);
-          transactionController.selectedDate = null;
-        },
-        icon: const Icon(
-          Icons.arrow_back,
-          size: 28,
-        ),
-      ),
+      automaticallyImplyLeading: automaticallyImplyLeading,
+      leading: automaticallyImplyLeading
+          ? IconButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                transactionController.setDropDownValue(null);
+                transactionController.setCategoryModel(null);
+                transactionController.setCategoryType(CategoryType.income);
+                transactionController.selectedDate = null;
+              },
+              icon: const Icon(
+                Icons.arrow_back,
+                size: 28,
+              ),
+            )
+          : null,
       backgroundColor: mainColor,
       title: Text(
         leading ?? '',

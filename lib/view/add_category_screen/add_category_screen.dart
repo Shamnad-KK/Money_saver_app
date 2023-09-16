@@ -19,7 +19,8 @@ class AddCategoryScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: const AppBarWidget(
-        leading: 'Add Category',
+        leading: 'Categories',
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(

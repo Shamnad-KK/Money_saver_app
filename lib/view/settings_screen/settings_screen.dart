@@ -23,6 +23,7 @@ class SettingScreen extends StatelessWidget {
     return Scaffold(
       appBar: const AppBarWidget(
         leading: 'Settings',
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: Container(
