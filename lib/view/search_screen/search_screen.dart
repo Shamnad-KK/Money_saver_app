@@ -18,9 +18,9 @@ class SearchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchController =
-        Provider.of<SearchController>(context, listen: false);
+        Provider.of<SearchingController>(context, listen: false);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      context.read<SearchController>().searchQuery('');
+      context.read<SearchingController>().searchQuery('');
     });
 
     return Scaffold(
@@ -49,12 +49,12 @@ class SearchScreen extends StatelessWidget {
                     hintText: 'Search...',
                   ),
                   onChanged: (_) => context
-                      .read<SearchController>()
+                      .read<SearchingController>()
                       .searchQuery(searchController.searchTextController.text),
                 ),
                 sBoxH10,
-                Consumer<SearchController>(
-                  builder: (BuildContext context, SearchController value,
+                Consumer<SearchingController>(
+                  builder: (BuildContext context, SearchingController value,
                       Widget? child) {
                     return value.foundList.isNotEmpty
                         ? ListView.builder(

@@ -6,6 +6,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 import 'package:money_manager/controllers/dropdown_controller.dart';
 import 'package:money_manager/controllers/transaction_controller.dart';
+import 'package:money_manager/helpers/constants.dart';
 import 'package:money_manager/helpers/enums.dart';
 import 'package:money_manager/helpers/text_style.dart';
 import 'package:money_manager/models/category/category_type_model/category_type_model.dart';
@@ -96,9 +97,22 @@ class TodayTransactionList extends StatelessWidget {
                         ),
                       ],
                     ),
-                    title: Text(
-                      value.foundData[index].categoryModal.name,
-                      style: appBodyTextStyle,
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          value.foundData[index].categoryModal.name,
+                          style: appBodyTextStyle,
+                        ),
+                        sBoxw10,
+                        Expanded(
+                          child: Text(
+                            "(${value.foundData[index].description ?? "No description"})",
+                            overflow: TextOverflow.ellipsis,
+                            style: homeDateStyle,
+                          ),
+                        ),
+                      ],
                     ),
                     trailing: Text(
                       '₹ ${value.foundData[index].amount.round()}',

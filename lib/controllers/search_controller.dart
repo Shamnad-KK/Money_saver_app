@@ -5,7 +5,7 @@ import 'package:money_manager/repository/search_repository.dart';
 import 'package:money_manager/utils/delete_alert_dialogue.dart';
 import 'package:money_manager/utils/snackbars.dart';
 
-class SearchController extends ChangeNotifier {
+class SearchingController extends ChangeNotifier {
   final TextEditingController searchTextController = TextEditingController();
   List<TransactionModal> _foundList = [];
   List<TransactionModal> get foundList => _foundList;

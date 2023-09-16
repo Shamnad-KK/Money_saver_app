@@ -82,19 +82,19 @@ class CategoryDBController with ChangeNotifier {
     if (value!.isEmpty) {
       return "Category is empty";
     }
-    if (tabController.index == 0) {
-      final income =
-          incomeModalNotifier.map((e) => e.name.trim().toLowerCase()).toList();
-      if (income.contains(categoryNameController.text.trim().toLowerCase())) {
-        return 'Category already exists';
-      }
-    }
-    if (tabController.index == 1) {
-      final expense =
-          expenseModalNotifier.map((e) => e.name.trim().toLowerCase()).toList();
-      if (expense.contains(categoryNameController.text.trim().toLowerCase())) {
-        return 'Category already exists';
-      }
+    final income =
+        incomeModalNotifier.map((e) => e.name.trim().toLowerCase()).toList();
+
+    final expense =
+        expenseModalNotifier.map((e) => e.name.trim().toLowerCase()).toList();
+    final incomeCategoryExists =
+        income.contains(categoryNameController.text.trim().toLowerCase());
+
+    final expenseCategoryExists =
+        expense.contains(categoryNameController.text.trim().toLowerCase());
+
+    if (incomeCategoryExists || expenseCategoryExists) {
+      return 'Category already exists';
     }
 
     return null;

@@ -16,7 +16,7 @@ import 'package:money_manager/widgets/appbar_widget.dart';
 import 'package:money_manager/widgets/custom_button.dart';
 import 'package:provider/provider.dart';
 
-class AddTransactionScreen extends StatelessWidget {
+class AddTransactionScreen extends StatefulWidget {
   const AddTransactionScreen({
     Key? key,
     required this.type,
@@ -24,16 +24,25 @@ class AddTransactionScreen extends StatelessWidget {
   }) : super(key: key);
   final ScreenAction type;
   final TransactionModal? transactionModal;
-  @override
-  Widget build(BuildContext context) {
-    log("add screen called");
 
-    final transactionController =
+  @override
+  State<AddTransactionScreen> createState() => _AddTransactionScreenState();
+}
+
+class _AddTransactionScreenState extends State<AddTransactionScreen> {
+  late final TransactionController transactionController;
+  late final CategoryDBController categoryController;
+  late final DropDownController dropDownController;
+
+  @override
+  void initState() {
+    transactionController =
         Provider.of<TransactionController>(context, listen: false);
-    final categoryController =
+    categoryController =
         Provider.of<CategoryDBController>(context, listen: false);
-    final dropDownController =
+    dropDownController =
         Provider.of<DropDownController>(context, listen: false);
+
     transactionController.amountController.clear();
     transactionController.dateController.clear();
     transactionController.desController?.clear();
@@ -41,20 +50,31 @@ class AddTransactionScreen extends StatelessWidget {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       categoryController.refreshUi();
-      if (type == ScreenAction.editScreen) {
-        transactionController.setCategoryModel(transactionModal?.categoryModal);
-        transactionController.setCategoryType(transactionModal!.type);
+      if (widget.type == ScreenAction.editScreen) {
+        transactionController
+            .setCategoryModel(widget.transactionModal?.categoryModal);
+        transactionController.setCategoryType(widget.transactionModal!.type);
+        transactionController
+            .setDropDownValue(widget.transactionModal!.categoryModal.name);
         transactionController.amountController.text =
-            transactionModal!.amount.toString();
+            widget.transactionModal!.amount.toString();
         transactionController.desController?.text =
-            transactionModal?.description ?? "No description";
+            widget.transactionModal?.description ?? "No description";
         transactionController.dateController.text =
-            DateFormat('yMMMMd').format(transactionModal!.date);
+            DateFormat('yMMMMd').format(widget.transactionModal!.date);
       }
     });
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    log("add screen called");
+
     return Scaffold(
       appBar: AppBarWidget(
-        leading: type == ScreenAction.addScreen
+        leading: widget.type == ScreenAction.addScreen
             ? 'Add Transaction'
             : 'Edit Transaction',
       ),
@@ -82,8 +102,8 @@ class AddTransactionScreen extends StatelessWidget {
                     return AddTransactionDropdownWidget(
                       transactionConsumer: transactionvalue,
                       categoryConsumer: categoryValue,
-                      type: type,
-                      transactionModal: transactionModal,
+                      type: widget.type,
+                      transactionModal: widget.transactionModal,
                     );
                   },
                 ),
@@ -113,8 +133,8 @@ class AddTransactionScreen extends StatelessWidget {
                         transactionController.amountController,
                         transactionController.dateController,
                         transactionController.desController,
-                        type,
-                        transactionModal,
+                        widget.type,
+                        widget.transactionModal,
                         context,
                       )
                           .then((value) async {

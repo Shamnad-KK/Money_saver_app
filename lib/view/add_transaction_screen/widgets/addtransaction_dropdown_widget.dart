@@ -24,6 +24,7 @@ class AddTransactionDropdownWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<String>(
+      value: transactionConsumer.dropDownValue,
       validator: (value) {
         if (value == null) {
           return 'Category type cannot be empty';
@@ -55,7 +56,6 @@ class AddTransactionDropdownWidget extends StatelessWidget {
       icon: const Icon(
         Icons.keyboard_arrow_down,
       ),
-      value: transactionConsumer.dropDownValue,
       onChanged: (newValue) {
         transactionConsumer.setDropDownValue(newValue);
       },
@@ -66,7 +66,7 @@ class AddTransactionDropdownWidget extends StatelessWidget {
                   onTap: () {
                     transactionConsumer.setCategoryModel(modal);
                   },
-                  value: modal.id.toString(),
+                  value: modal.name.toString(),
                   child: Text(
                     modal.name,
                     style: appBodyTextStyle,

@@ -133,9 +133,22 @@ class CustomTransactionList extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              title: Text(
-                                value.foundData[index].categoryModal.name,
-                                style: appBodyTextStyle,
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    value.foundData[index].categoryModal.name,
+                                    style: appBodyTextStyle,
+                                  ),
+                                  sBoxw10,
+                                  Expanded(
+                                    child: Text(
+                                      "(${value.foundData[index].description ?? "No description"})",
+                                      overflow: TextOverflow.ellipsis,
+                                      style: homeDateStyle,
+                                    ),
+                                  ),
+                                ],
                               ),
                               trailing: Text(
                                 "₹ ${value.foundData[index].amount.round()}",

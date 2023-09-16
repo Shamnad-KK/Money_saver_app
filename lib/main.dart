@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider(create: (ctx) => DropDownController()),
               ChangeNotifierProvider(create: (ctx) => TransactionController()),
               ChangeNotifierProvider(create: (ctx) => CategoryDBController()),
-              ChangeNotifierProvider(create: (ctx) => SearchController()),
+              ChangeNotifierProvider(create: (ctx) => SearchingController()),
               ChangeNotifierProvider(create: (ctx) => StatisticsController()),
               ChangeNotifierProvider(create: (ctx) => BottomNavController()),
             ],
